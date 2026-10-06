@@ -1,11 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-desert-red: #9e3d2a;   /* Inspirado en el rojo intenso del Cuzco */
-  --color-desert-earth: #c86343; /* Tierra arcillosa */
-  --color-desert-sand: #f2e2ce;  /* Arena clara */
-  --color-desert-stone: #9ba09d; /* Gris de Los Hoyos */
-  --color-desert-night: #2a333a; /* Cielo nocturno del observatorio */
+  --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  
+  --color-desert-red: #9e3d2a;
+  --color-desert-earth: #c86343;
+  --color-desert-sand: #f2e2ce;
+  --color-desert-stone: #9ba09d;
+  --color-desert-night: #2a333a;
+  
+  /* Tinted shadows required by design-taste-frontend */
+  --shadow-desert-sm: 0 2px 8px rgba(200, 99, 67, 0.08);
+  --shadow-desert-md: 0 8px 24px rgba(200, 99, 67, 0.12);
+  --shadow-desert-lg: 0 16px 40px rgba(158, 61, 42, 0.16);
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: #FDFBF7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Ocultar barra de scroll para los filtros */
