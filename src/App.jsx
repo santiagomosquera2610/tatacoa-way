@@ -58,11 +58,19 @@ export default function App() {
 }
 
 function DirectorioView() {
-  const guias = [
-    { id: 1, nombre: "Carlos Ramírez", especialidad: "Tour Astronómico", verificado: true },
-    { id: 2, nombre: "María Gómez", especialidad: "Ruta del Cuzco (Rojo)", verificado: true },
-    { id: 3, nombre: "Asoc. Villavieja", especialidad: "Transporte y Tour completo", verificado: true },
+  const [filtro, setFiltro] = useState('Todos');
+  const categorias = ['Todos', 'Guías', 'Transporte', 'Hospedaje', 'Gastronomía'];
+
+  const servicios = [
+    { id: 1, nombre: "Carlos Ramírez", especialidad: "Tour Astronómico", verificado: true, categoria: "Guías" },
+    { id: 2, nombre: "María Gómez", especialidad: "Ruta del Cuzco (Rojo)", verificado: true, categoria: "Guías" },
+    { id: 3, nombre: "Asoc. Villavieja", especialidad: "Transporte desde Neiva", verificado: true, categoria: "Transporte" },
+    { id: 4, nombre: "TukTuk Tatacoa", especialidad: "Movilidad interna desierto", verificado: true, categoria: "Transporte" },
+    { id: 5, nombre: "Hostal Noches de Saturno", especialidad: "Cabañas y Zona de Camping", verificado: true, categoria: "Hospedaje" },
+    { id: 6, nombre: "Restaurante El Oasis", especialidad: "Platos típicos y Chivo", verificado: true, categoria: "Gastronomía" },
   ];
+
+  const serviciosFiltrados = servicios.filter(s => filtro === 'Todos' || s.categoria === filtro);
 
   return (
     <div className="p-4 overflow-y-auto h-full animate-in fade-in duration-300">
@@ -70,32 +78,53 @@ function DirectorioView() {
         <div className="flex items-start gap-3">
           <Info className="text-orange-600 shrink-0 mt-0.5" size={20} />
           <p className="text-sm text-gray-700">
-            Contacta a los guías locales sin intermediarios. <strong>Cero comisiones.</strong>
+            Contacta locales sin intermediarios. <strong>Cero comisiones.</strong>
           </p>
         </div>
       </div>
-      <h2 className="text-xl font-extrabold text-gray-800 mb-4">Guías Certificados</h2>
+
+      <div className="mb-5">
+        <h2 className="text-xl font-extrabold text-gray-800 mb-3">Explorar Servicios</h2>
+        <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+          {categorias.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setFiltro(cat)}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${filtro === cat ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      </div>
+      
       <div className="flex flex-col gap-4 pb-4">
-        {guias.map(guia => (
-          <div key={guia.id} className="border border-gray-200 rounded-2xl p-4 shadow-sm bg-white flex flex-col hover:border-orange-300 transition-colors">
+        {serviciosFiltrados.map(servicio => (
+          <div key={servicio.id} className="border border-gray-200 rounded-2xl p-4 shadow-sm bg-white flex flex-col hover:border-orange-300 transition-colors">
             <div className="flex justify-between items-start mb-3">
               <div>
                 <h3 className="font-bold text-gray-900 flex items-center gap-1.5 text-lg">
-                  {guia.nombre} 
-                  {guia.verificado && <CheckCircle size={18} className="text-green-500" />}
+                  {servicio.nombre} 
+                  {servicio.verificado && <CheckCircle size={18} className="text-green-500" />}
                 </h3>
-                <p className="text-sm text-gray-500 font-medium">{guia.especialidad}</p>
+                <p className="text-sm text-gray-500 font-medium">{servicio.especialidad}</p>
+                <span className="inline-block mt-1 text-xs font-semibold text-orange-600 bg-orange-100 border border-orange-200 px-2 py-0.5 rounded-md">
+                  {servicio.categoria}
+                </span>
               </div>
-              <div className="bg-green-100 text-green-700 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider">
+              <div className="bg-green-100 text-green-700 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider shrink-0">
                 Disponible
               </div>
             </div>
             <button className="mt-2 w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-2.5 rounded-xl flex items-center justify-center gap-2 font-semibold transition-all shadow-sm active:scale-[0.98]">
               <Phone size={20} />
-              Contactar por WhatsApp
+              Contactar
             </button>
           </div>
         ))}
+        {serviciosFiltrados.length === 0 && (
+          <p className="text-center text-gray-500 mt-4">No hay servicios en esta categoría aún.</p>
+        )}
       </div>
     </div>
   );
