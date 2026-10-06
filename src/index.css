@@ -31,3 +31,8 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+/* Filtro para que el mapa estándar se vea con estilo desértico/premium */
+.desert-map-tiles {
+  filter: sepia(0.2) hue-rotate(-10deg) saturate(1.1) contrast(0.95);
+}

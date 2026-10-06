@@ -328,7 +328,7 @@ function MapaView() {
         zoomControl={false}
       >
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" className="desert-map-tiles"
           attribution='&copy; OpenStreetMap'
         />
         
