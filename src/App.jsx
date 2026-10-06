@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Map, List, Phone, CheckCircle, Info, Navigation, ArrowLeft, Star, Clock, Check, MapPin } from 'lucide-react';
+import { Map, List, Phone, CheckCircle, Info, Navigation, ArrowLeft, Star, Clock, Check, MapPin, Compass } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import { motion, AnimatePresence } from 'motion/react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { DescubreView } from './DescubreView';
 
 // Arreglar ícono Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -74,8 +75,17 @@ const SERVICIOS_BD = [
 ];
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('directorio');
+  const [activeTab, setActiveTab] = useState('descubre');
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'directorio': return <DirectorioView onSelect={setItemSeleccionado} />;
+      case 'mapa': return <MapaView />;
+      case 'descubre': return <DescubreView />;
+      default: return null;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex justify-center selection:bg-desert-earth selection:text-white">
@@ -96,35 +106,44 @@ export default function App() {
               exit={{ opacity: 0, scale: 0.98 }}
               className="flex-1 flex flex-col h-full relative"
             >
-              {/* Encabezado Premium (Glassmorphism) */}
-              <header className="absolute top-0 w-full z-[100] px-6 pt-12 pb-4 bg-gradient-to-b from-[#FDFBF7] via-[#FDFBF7]/90 to-transparent">
-                <h1 className="text-3xl font-black text-desert-night tracking-tight flex items-center gap-2">
-                  <MapPin className="text-desert-earth" size={28} strokeWidth={2.5} />
-                  Tatacoa Way
-                </h1>
-                <p className="text-desert-stone text-sm font-medium mt-1">Explora sin perderte</p>
-              </header>
+              {/* Encabezado Premium - Oculto solo en Descubre porque tiene su propio hero header */}
+              {activeTab !== 'descubre' && (
+                <header className="absolute top-0 w-full z-[100] px-6 pt-12 pb-4 bg-gradient-to-b from-[#FDFBF7] via-[#FDFBF7]/90 to-transparent">
+                  <h1 className="text-3xl font-black text-desert-night tracking-tight flex items-center gap-2">
+                    <MapPin className="text-desert-earth" size={28} strokeWidth={2.5} />
+                    Tatacoa Way
+                  </h1>
+                  <p className="text-desert-stone text-sm font-medium mt-1">Explora sin perderte</p>
+                </header>
+              )}
 
-              <main className="flex-1 overflow-hidden relative pt-[110px]">
-                {activeTab === 'directorio' ? <DirectorioView onSelect={setItemSeleccionado} /> : <MapaView />}
+              <main className={`flex-1 overflow-hidden relative ${activeTab !== 'descubre' ? 'pt-[110px]' : ''}`}>
+                {renderContent()}
               </main>
 
               {/* Bottom Nav Premium (Floating Dock) */}
-              <div className="absolute bottom-8 w-full px-8 z-[200]">
-                <div className="bg-white/80 backdrop-blur-xl border border-white shadow-desert-lg rounded-full flex justify-between p-1.5 items-center">
+              <div className="absolute bottom-8 w-full px-6 z-[200]">
+                <div className="bg-white/90 backdrop-blur-xl border border-white shadow-desert-lg rounded-full flex justify-between p-1.5 items-center">
+                  <button 
+                    onClick={() => setActiveTab('descubre')}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-full transition-all duration-300 ${activeTab === 'descubre' ? 'bg-desert-night text-white shadow-md' : 'text-desert-stone hover:text-desert-night hover:bg-black/5'}`}
+                  >
+                    <Compass size={20} strokeWidth={activeTab === 'descubre' ? 2.5 : 2} />
+                    {activeTab === 'descubre' && <span className="text-xs font-bold">Descubre</span>}
+                  </button>
                   <button 
                     onClick={() => setActiveTab('directorio')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full transition-all duration-300 ${activeTab === 'directorio' ? 'bg-desert-night text-white shadow-md' : 'text-desert-stone hover:text-desert-night hover:bg-black/5'}`}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-full transition-all duration-300 ${activeTab === 'directorio' ? 'bg-desert-night text-white shadow-md' : 'text-desert-stone hover:text-desert-night hover:bg-black/5'}`}
                   >
                     <List size={20} strokeWidth={activeTab === 'directorio' ? 2.5 : 2} />
-                    {activeTab === 'directorio' && <span className="text-sm font-bold">Directorio</span>}
+                    {activeTab === 'directorio' && <span className="text-xs font-bold">Directorio</span>}
                   </button>
                   <button 
                     onClick={() => setActiveTab('mapa')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-full transition-all duration-300 ${activeTab === 'mapa' ? 'bg-desert-night text-white shadow-md' : 'text-desert-stone hover:text-desert-night hover:bg-black/5'}`}
+                    className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-full transition-all duration-300 ${activeTab === 'mapa' ? 'bg-desert-night text-white shadow-md' : 'text-desert-stone hover:text-desert-night hover:bg-black/5'}`}
                   >
                     <Map size={20} strokeWidth={activeTab === 'mapa' ? 2.5 : 2} />
-                    {activeTab === 'mapa' && <span className="text-sm font-bold">Mapa Seguro</span>}
+                    {activeTab === 'mapa' && <span className="text-xs font-bold">Mapa</span>}
                   </button>
                 </div>
               </div>
@@ -310,6 +329,27 @@ function MapaView() {
     [3.2200, -75.1500],
   ];
 
+  const requestLocation = () => {
+    setIsLocating(true);
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation([position.coords.latitude, position.coords.longitude]);
+          setIsLocating(false);
+        },
+        (error) => {
+          console.error(error);
+          alert("Debes permitir el acceso a tu ubicación en el navegador para usar el GPS.");
+          setIsLocating(false);
+        },
+        { enableHighAccuracy: true }
+      );
+    } else {
+      alert("Tu navegador no soporta geolocalización.");
+      setIsLocating(false);
+    }
+  };
+
   return (
     <div className="animate-in fade-in duration-300 h-full flex flex-col relative bg-[#FDFBF7]">
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[400] w-[85%] bg-white/90 backdrop-blur-xl p-3.5 rounded-2xl shadow-desert-md border border-white">
@@ -320,6 +360,14 @@ function MapaView() {
         <p className="text-xs text-desert-stone text-center font-medium">Sigue la línea azul para no perderte</p>
       </div>
 
+      <button 
+        onClick={requestLocation}
+        className={`absolute bottom-32 right-6 z-[400] bg-white p-4 rounded-full shadow-xl border-2 transition-all ${isLocating ? 'border-desert-earth animate-pulse' : 'border-blue-500 hover:bg-blue-50'}`}
+        title="Mi Ubicación"
+      >
+        <Navigation size={26} className={isLocating ? 'text-desert-earth' : 'text-blue-600'} />
+      </button>
+
       <MapContainer 
         center={tatacoaCenter} 
         zoom={14} 
@@ -328,8 +376,9 @@ function MapaView() {
         zoomControl={false}
       >
         <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" className="desert-map-tiles"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; OpenStreetMap'
+          className="desert-map-tiles"
         />
         
         {marcadores.map(lugar => (
@@ -344,7 +393,26 @@ function MapaView() {
           positions={rutaSegura} 
           pathOptions={{ color: '#3b82f6', weight: 5, opacity: 0.8, dashArray: '12, 12', lineCap: 'round' }} 
         />
+        <UserLocationMarker location={userLocation} />
       </MapContainer>
     </div>
   );
+}
+
+// Componente oculto pero necesario para Leaflet en este archivo (o puedes moverlo)
+function UserLocationMarker({ location }) {
+  const map = useMap();
+  useEffect(() => {
+    if (location) {
+      map.flyTo(location, 14, { animate: true, duration: 1.5 });
+    }
+  }, [location, map]);
+
+  return location ? (
+    <Marker position={location} icon={userIcon}>
+      <Popup>
+        <div className="text-center font-bold text-blue-600">¡Tú estás aquí!</div>
+      </Popup>
+    </Marker>
+  ) : null;
 }
