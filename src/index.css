@@ -1,1 +1,18 @@
 @import "tailwindcss";
+
+@theme {
+  --color-desert-red: #9e3d2a;   /* Inspirado en el rojo intenso del Cuzco */
+  --color-desert-earth: #c86343; /* Tierra arcillosa */
+  --color-desert-sand: #f2e2ce;  /* Arena clara */
+  --color-desert-stone: #9ba09d; /* Gris de Los Hoyos */
+  --color-desert-night: #2a333a; /* Cielo nocturno del observatorio */
+}
+
+/* Ocultar barra de scroll para los filtros */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}

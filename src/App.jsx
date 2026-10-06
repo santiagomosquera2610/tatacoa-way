@@ -24,29 +24,29 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('mapa');
 
   return (
-    <div className="min-h-screen bg-gray-100 flex justify-center font-sans">
-      <div className="w-full max-w-md bg-white shadow-2xl relative pb-20 overflow-hidden flex flex-col h-screen">
+    <div className="min-h-screen bg-[#FDFBF7] flex justify-center font-sans">
+      <div className="w-full max-w-md bg-white shadow-2xl relative pb-20 overflow-hidden flex flex-col h-screen border-x border-desert-sand/50">
         
-        <header className="bg-orange-600 text-white p-5 sticky top-0 z-[1000] shadow-md">
+        <header className="bg-desert-red text-white p-5 sticky top-0 z-[1000] shadow-md">
           <h1 className="text-2xl font-bold text-center tracking-wide">Tatacoa Way</h1>
-          <p className="text-center text-orange-100 text-sm mt-1">Explora sin perderte</p>
+          <p className="text-center text-desert-sand text-sm mt-1 opacity-90">Explora sin perderte</p>
         </header>
 
         <main className="flex-1 overflow-hidden relative z-0">
           {activeTab === 'directorio' ? <DirectorioView /> : <MapaView />}
         </main>
 
-        <nav className="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 flex justify-around p-2 z-[1000] pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <nav className="fixed bottom-0 w-full max-w-md bg-white border-t border-desert-sand/50 flex justify-around p-2 z-[1000] pb-6 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
           <button 
             onClick={() => setActiveTab('directorio')}
-            className={`flex flex-col items-center p-2 w-full transition-colors ${activeTab === 'directorio' ? 'text-orange-600' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`flex flex-col items-center p-2 w-full transition-colors ${activeTab === 'directorio' ? 'text-desert-red' : 'text-desert-stone hover:text-desert-night'}`}
           >
             <List size={26} />
             <span className="text-xs mt-1 font-medium">Directorio</span>
           </button>
           <button 
             onClick={() => setActiveTab('mapa')}
-            className={`flex flex-col items-center p-2 w-full transition-colors ${activeTab === 'mapa' ? 'text-orange-600' : 'text-gray-400 hover:text-gray-600'}`}
+            className={`flex flex-col items-center p-2 w-full transition-colors ${activeTab === 'mapa' ? 'text-desert-red' : 'text-desert-stone hover:text-desert-night'}`}
           >
             <Map size={26} />
             <span className="text-xs mt-1 font-medium">Mapa Seguro</span>
@@ -73,24 +73,24 @@ function DirectorioView() {
   const serviciosFiltrados = servicios.filter(s => filtro === 'Todos' || s.categoria === filtro);
 
   return (
-    <div className="p-4 overflow-y-auto h-full animate-in fade-in duration-300">
-      <div className="mb-6 bg-orange-50 border border-orange-200 rounded-xl p-4">
+    <div className="p-4 overflow-y-auto h-full animate-in fade-in duration-300 bg-[#FDFBF7]">
+      <div className="mb-6 bg-desert-sand/40 border border-desert-earth/20 rounded-xl p-4">
         <div className="flex items-start gap-3">
-          <Info className="text-orange-600 shrink-0 mt-0.5" size={20} />
-          <p className="text-sm text-gray-700">
-            Contacta locales sin intermediarios. <strong>Cero comisiones.</strong>
+          <Info className="text-desert-earth shrink-0 mt-0.5" size={20} />
+          <p className="text-sm text-desert-night">
+            Contacta locales sin intermediarios. <strong className="text-desert-red">Cero comisiones.</strong>
           </p>
         </div>
       </div>
 
       <div className="mb-5">
-        <h2 className="text-xl font-extrabold text-gray-800 mb-3">Explorar Servicios</h2>
-        <div className="flex gap-2 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
+        <h2 className="text-xl font-extrabold text-desert-night mb-3">Explorar Servicios</h2>
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {categorias.map(cat => (
             <button
               key={cat}
               onClick={() => setFiltro(cat)}
-              className={`px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${filtro === cat ? 'bg-orange-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+              className={`px-4 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap transition-colors ${filtro === cat ? 'bg-desert-earth text-white shadow-sm' : 'bg-white border border-desert-sand text-desert-stone hover:bg-desert-sand/30'}`}
             >
               {cat}
             </button>
@@ -100,19 +100,19 @@ function DirectorioView() {
       
       <div className="flex flex-col gap-4 pb-4">
         {serviciosFiltrados.map(servicio => (
-          <div key={servicio.id} className="border border-gray-200 rounded-2xl p-4 shadow-sm bg-white flex flex-col hover:border-orange-300 transition-colors">
+          <div key={servicio.id} className="border border-desert-sand/60 rounded-2xl p-4 shadow-sm bg-white flex flex-col hover:border-desert-earth/50 transition-colors">
             <div className="flex justify-between items-start mb-3">
               <div>
-                <h3 className="font-bold text-gray-900 flex items-center gap-1.5 text-lg">
+                <h3 className="font-bold text-desert-night flex items-center gap-1.5 text-lg">
                   {servicio.nombre} 
-                  {servicio.verificado && <CheckCircle size={18} className="text-green-500" />}
+                  {servicio.verificado && <CheckCircle size={18} className="text-[#25D366]" />}
                 </h3>
-                <p className="text-sm text-gray-500 font-medium">{servicio.especialidad}</p>
-                <span className="inline-block mt-1 text-xs font-semibold text-orange-600 bg-orange-100 border border-orange-200 px-2 py-0.5 rounded-md">
+                <p className="text-sm text-desert-stone font-medium">{servicio.especialidad}</p>
+                <span className="inline-block mt-1 text-xs font-semibold text-desert-earth bg-desert-sand/40 border border-desert-earth/20 px-2 py-0.5 rounded-md">
                   {servicio.categoria}
                 </span>
               </div>
-              <div className="bg-green-100 text-green-700 text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider shrink-0">
+              <div className="bg-[#25D366]/10 text-[#25D366] text-xs px-2.5 py-1 rounded-md font-bold uppercase tracking-wider shrink-0">
                 Disponible
               </div>
             </div>
@@ -123,7 +123,7 @@ function DirectorioView() {
           </div>
         ))}
         {serviciosFiltrados.length === 0 && (
-          <p className="text-center text-gray-500 mt-4">No hay servicios en esta categoría aún.</p>
+          <p className="text-center text-desert-stone mt-4">No hay servicios en esta categoría aún.</p>
         )}
       </div>
     </div>
@@ -187,20 +187,20 @@ function MapaView() {
   };
 
   return (
-    <div className="animate-in fade-in duration-300 h-full flex flex-col relative">
+    <div className="animate-in fade-in duration-300 h-full flex flex-col relative bg-[#FDFBF7]">
       {/* Etiqueta superior */}
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[400] w-[90%] bg-white/95 backdrop-blur-sm p-3 rounded-xl shadow-lg border border-orange-100">
-        <h2 className="text-sm font-extrabold text-orange-600 mb-0.5 text-center">Ruta Segura Activa</h2>
-        <p className="text-xs text-gray-600 text-center font-medium">Sigue la línea azul para no desorientarte</p>
+      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[400] w-[90%] bg-white/95 backdrop-blur-sm p-3 rounded-xl shadow-md border border-desert-sand">
+        <h2 className="text-sm font-extrabold text-desert-red mb-0.5 text-center">Ruta Segura Activa</h2>
+        <p className="text-xs text-desert-stone text-center font-medium">Sigue la línea azul para no desorientarte</p>
       </div>
 
       {/* Botón Flotante de GPS */}
       <button 
         onClick={requestLocation}
-        className={`absolute bottom-6 right-4 z-[400] bg-white p-3 rounded-full shadow-xl border-2 transition-all ${isLocating ? 'border-orange-400 animate-pulse' : 'border-blue-500 hover:bg-blue-50'}`}
+        className={`absolute bottom-6 right-4 z-[400] bg-white p-3 rounded-full shadow-xl border-2 transition-all ${isLocating ? 'border-desert-earth animate-pulse' : 'border-blue-500 hover:bg-blue-50'}`}
         title="Mi Ubicación"
       >
-        <Navigation size={24} className={isLocating ? 'text-orange-500' : 'text-blue-600'} />
+        <Navigation size={24} className={isLocating ? 'text-desert-earth' : 'text-blue-600'} />
       </button>
 
       <MapContainer 
@@ -219,8 +219,8 @@ function MapaView() {
           <Marker key={lugar.id} position={lugar.pos}>
             <Popup>
               <div className="text-center">
-                <strong className="block text-orange-600 mb-1">{lugar.nombre}</strong>
-                <span className="text-xs text-gray-600">{lugar.desc}</span>
+                <strong className="block text-desert-earth mb-1">{lugar.nombre}</strong>
+                <span className="text-xs text-desert-stone">{lugar.desc}</span>
               </div>
             </Popup>
           </Marker>
