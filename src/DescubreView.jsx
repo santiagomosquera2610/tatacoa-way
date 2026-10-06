@@ -11,7 +11,7 @@ export function DescubreView() {
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
-          src="https://images.unsplash.com/photo-1541285227702-8a9d18c3b526?auto=format&fit=crop&w=800&q=80" 
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Desierto_de_la_Tatacoa_-_camilogaleano%28com%29.jpg/800px-Desierto_de_la_Tatacoa_-_camilogaleano%28com%29.jpg" 
           alt="Desierto Tatacoa"
           className="absolute inset-0 w-full h-full object-cover"
         />

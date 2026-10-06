@@ -26,7 +26,7 @@ const userIcon = L.divIcon({
 const SERVICIOS_BD = [
   { 
     id: 1, nombre: "Carlos Ramírez", especialidad: "Tour Astronómico", verificado: true, categoria: "Guías",
-    fotoUrl: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=800&q=80",
+    fotoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/B%C3%B3veda_celeste_profunda_en_el_desierto_de_la_Tatacoa.jpg/800px-B%C3%B3veda_celeste_profunda_en_el_desierto_de_la_Tatacoa.jpg",
     descripcion: "Guía local certificado por el observatorio. Conmigo aprenderás a leer las estrellas y constelaciones aprovechando los cielos despejados de la Tatacoa. Incluye uso de telescopio profesional.",
     precio: "$40.000 COP / pers",
     incluye: ["Charla astronómica de 2 horas", "Telescopio profesional", "Fotografía estelar con celular"],
@@ -34,7 +34,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 2, nombre: "María Gómez", especialidad: "Ruta del Cuzco", verificado: true, categoria: "Guías",
-    fotoUrl: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?auto=format&fit=crop&w=800&q=80",
+    fotoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Desierto_de_la_Tatacoa_-_camilogaleano%28com%29.jpg/800px-Desierto_de_la_Tatacoa_-_camilogaleano%28com%29.jpg",
     descripcion: "Recorrido inmersivo por el laberinto del Desierto Rojo (Cuzco). Te contaré la historia geológica y te mostraré las formaciones más impresionantes para tus fotos.",
     precio: "$35.000 COP / grupo",
     incluye: ["Recorrido guiado de 2.5h", "Hidratación básica", "Paradas fotográficas"],
@@ -42,7 +42,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 3, nombre: "Asoc. Villavieja", especialidad: "Transporte Neiva", verificado: true, categoria: "Transporte",
-    fotoUrl: "https://images.unsplash.com/photo-1519003300449-424ad0405076?auto=format&fit=crop&w=800&q=80",
+    fotoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Atardecer_en_el_Desierto_de_la_Tatacoa.JPG/800px-Atardecer_en_el_Desierto_de_la_Tatacoa.JPG",
     descripcion: "Cooperativa oficial de transporte. Te recogemos en el terminal de Neiva o el aeropuerto y te llevamos directo a tu hostal en el desierto con total seguridad.",
     precio: "$25.000 COP / tray",
     incluye: ["Aire acondicionado", "Seguro de viaje", "Conductor local"],
@@ -50,7 +50,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 4, nombre: "TukTuk Tatacoa", especialidad: "Movilidad desierto", verificado: true, categoria: "Transporte",
-    fotoUrl: "https://images.unsplash.com/photo-1620023602484-9bc504b2b623?auto=format&fit=crop&w=800&q=80",
+    fotoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Afternoon_Tatacoa.jpg/800px-Afternoon_Tatacoa.jpg",
     descripcion: "El transporte más divertido para moverte entre Los Hoyos y El Cuzco. Disfruta de la brisa mientras te llevamos.",
     precio: "$15.000 COP / viaje",
     incluye: ["Capacidad 3 personas", "Paseo panorámico", "Música a bordo"],
@@ -58,7 +58,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 5, nombre: "Hostal Saturno", especialidad: "Camping y Cabañas", verificado: true, categoria: "Hospedaje",
-    fotoUrl: "https://images.unsplash.com/photo-1504280190538-4b7ab7c6317b?auto=format&fit=crop&w=800&q=80",
+    fotoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Atardecer_Parque_Natural_Regional_La_Tatacoa.jpg/800px-Atardecer_Parque_Natural_Regional_La_Tatacoa.jpg",
     descripcion: "Descansa bajo las estrellas. Ofrecemos cabañas ecológicas y alquiler de carpas listas para usar. Tenemos piscina para refrescarte del calor del mediodía.",
     precio: "Desde $30.000",
     incluye: ["Acceso a piscina", "Baños compartidos", "Restaurante local"],
@@ -66,7 +66,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 6, nombre: "Rest. El Oasis", especialidad: "Platos típicos", verificado: true, categoria: "Gastronomía",
-    fotoUrl: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=800&q=80",
+    fotoUrl: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Apaciguamiento_en_el_Desierto_de_la_Tatacoa.jpg/800px-Apaciguamiento_en_el_Desierto_de_la_Tatacoa.jpg",
     descripcion: "Parada obligatoria para almorzar. Nuestro plato estrella es el estofado de chivo tradicional de la región, acompañado de jugo de cactus local.",
     precio: "Desde $25.000",
     incluye: ["Comida típica", "Opciones vegetarianas", "Refrescos helados"],
