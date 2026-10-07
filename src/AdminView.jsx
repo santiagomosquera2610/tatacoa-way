@@ -16,6 +16,12 @@ const FOTOS_DISPONIBLES = [
   '/img/motocarro-tatacoa.jpg', '/img/glamping-desierto.jpg', '/img/achiras-huila.jpg',
   '/img/bosque-tropical.jpg', '/img/cordillera-andes.jpg', '/img/los-hoyos.jpg',
   '/img/atardecer-tatacoa.jpg', '/img/fosiles-tatacoa.jpg',
+  '/img/observatorio-tatacoa.jpg', '/img/mirador-rojo.jpg', '/img/banco-arena.jpg',
+  '/img/estoraque-torre.jpg', '/img/sendero-xilopalos.jpg', '/img/mirador-ventana.jpg',
+  '/img/drogueria-central.jpg', '/img/hostal-laberintos.jpg', '/img/finca-cuzco.jpg',
+  '/img/hostal-tranquilidad.jpg', '/img/bethel-hotel.jpg', '/img/yararaka-hotel.jpg',
+  '/img/rincon-cabrito.jpg', '/img/estadero-deseo.jpg', '/img/sol-y-luna.jpg',
+  '/img/oasis-meson.jpg', '/img/sol-picante.jpg', '/img/tatacoa-fusion.jpg',
 ];
 
 const SPRING_SUAVE = { type: 'spring', damping: 32, stiffness: 320 };
@@ -522,6 +528,8 @@ function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
   const [form, setForm] = useState({
     ...servicio,
     incluyeTexto: (servicio.incluye ?? []).join(', '),
+    telefono: servicio.telefono ?? '',
+    rating: servicio.rating ?? '',
     lat: servicio.lat ?? '',
     lon: servicio.lon ?? '',
   });
@@ -537,7 +545,8 @@ function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
     const datos = {
       ...form,
       incluye: form.incluyeTexto.split(',').map(s => s.trim()).filter(Boolean),
-      rating: Number(form.rating),
+      rating: form.rating === '' ? null : Number(form.rating),
+      telefono: form.telefono === '' ? null : form.telefono,
       lat: form.lat === '' ? null : Number(form.lat),
       lon: form.lon === '' ? null : Number(form.lon),
     };
@@ -608,7 +617,7 @@ function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
           </div>
         </div>
 
-        <Campo label="Teléfono WhatsApp (57...)" value={form.telefono} onChange={v => campo('telefono', v)} required />
+        <Campo label="Teléfono WhatsApp (57...)" value={form.telefono} onChange={v => campo('telefono', v)} placeholder="Déjalo vacío si no lo tienes todavía" />
         <Campo label="Precio" value={form.precio} onChange={v => campo('precio', v)} required />
 
         <div className="flex flex-col gap-2">
@@ -623,7 +632,17 @@ function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
         </div>
 
         <Campo label="Incluye (separado por comas)" value={form.incluyeTexto} onChange={v => campo('incluyeTexto', v)} />
-        <Campo label="Calificación inicial (1-5)" type="number" step="0.1" min="1" max="5" value={form.rating} onChange={v => campo('rating', v)} required />
+        <Campo label="Calificación inicial (1-5)" type="number" step="0.1" min="1" max="5" value={form.rating} onChange={v => campo('rating', v)} placeholder="Déjalo vacío si aún no se ha evaluado" />
+
+        <label className="flex items-center gap-3 bg-desert-sand/20 rounded-2xl p-4 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={form.verificado}
+            onChange={e => campo('verificado', e.target.checked)}
+            className="w-5 h-5 accent-desert-earth"
+          />
+          <span className="text-sm font-bold text-desert-night">Verificado por el semillero</span>
+        </label>
 
         <div className="grid grid-cols-2 gap-3">
           <Campo label="Latitud" type="number" step="0.0001" value={form.lat} onChange={v => campo('lat', v)} placeholder="3.2340" />

@@ -7,6 +7,9 @@ export function calificacionDe(servicio, agregados) {
       esReal: true,
     };
   }
+  if (servicio.rating == null) {
+    return { valor: null, detalle: 'Aún sin calificar', esReal: false };
+  }
   return {
     valor: servicio.rating,
     detalle: 'Calificación inicial del semillero',

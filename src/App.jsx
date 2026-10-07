@@ -63,6 +63,16 @@ const iconoServicioVerificado = L.divIcon({
   iconAnchor: [14, 20],
 });
 
+// Negocios reales listados pero aún no verificados por el semillero:
+// mismo color de categoría, sin el check, para no implicar una garantía
+// que todavía no existe.
+const iconoServicioSinVerificar = L.divIcon({
+  className: 'bg-transparent border-none',
+  html: `<div class="w-6 h-6 rounded-full bg-desert-night border-2 border-white shadow-lg flex items-center justify-center text-white font-black" style="font-size:10px">?</div>`,
+  iconSize: [24, 24],
+  iconAnchor: [12, 18],
+});
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('descubre');
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
@@ -234,10 +244,16 @@ function DirectorioView({ onSelect, resenas, servicios }) {
               <div className="w-28 h-32 shrink-0 rounded-[18px] overflow-hidden bg-desert-sand relative">
                 <img src={servicio.fotoUrl} alt={servicio.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"></div>
-                <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
-                  <Star size={10} className="text-desert-earth fill-current" />
-                  <span className="text-[10px] font-bold text-desert-night">{calificacion.valor}</span>
-                </div>
+                {calificacion.valor != null ? (
+                  <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
+                    <Star size={10} className="text-desert-earth fill-current" />
+                    <span className="text-[10px] font-bold text-desert-night">{calificacion.valor}</span>
+                  </div>
+                ) : (
+                  <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-lg shadow-sm">
+                    <span className="text-[10px] font-bold text-desert-stone">Nuevo</span>
+                  </div>
+                )}
               </div>
               <div className="py-2 pr-3 flex-1 flex flex-col justify-center min-w-0">
                 <span className="text-[10px] font-bold text-desert-earth uppercase tracking-wider mb-1">
@@ -297,12 +313,23 @@ function DetalleServicioView({ servicio, onBack, resenas }) {
       </div>
 
       <div className="p-6 flex-1 pb-32">
+        {!servicio.verificado && (
+          <div className="flex items-center gap-2 bg-desert-sand/30 text-desert-night text-xs font-bold px-4 py-3 rounded-2xl mb-6">
+            <Info size={14} className="text-desert-earth shrink-0" />
+            Lugar real tomado de mapas abiertos, aún sin verificar por el semillero.
+          </div>
+        )}
+
         <div className="flex gap-6 mb-8 pb-8 border-b border-desert-sand/40">
           <div className="flex flex-col gap-1">
             <span className="text-sm text-desert-stone font-medium">Valoración</span>
-            <div className="flex items-center text-desert-night font-black text-xl gap-1">
-              <Star size={20} className="fill-desert-earth text-desert-earth" /> {calificacion.valor}
-            </div>
+            {calificacion.valor != null ? (
+              <div className="flex items-center text-desert-night font-black text-xl gap-1">
+                <Star size={20} className="fill-desert-earth text-desert-earth" /> {calificacion.valor}
+              </div>
+            ) : (
+              <span className="text-desert-night font-black text-sm">Sin calificar</span>
+            )}
             <span className="text-[11px] text-desert-stone font-medium">{calificacion.detalle}</span>
           </div>
           <div className="w-px bg-desert-sand/50"></div>
@@ -317,23 +344,27 @@ function DetalleServicioView({ servicio, onBack, resenas }) {
           {servicio.descripcion}
         </p>
 
-        <h2 className="text-xl font-black text-desert-night mb-4">¿Qué incluye?</h2>
-        <ul className="space-y-4 mb-6">
-          {servicio.incluye.map((item, idx) => (
-            <motion.li 
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 + (idx * 0.1) }}
-              key={idx} 
-              className="flex items-center gap-3 text-desert-night font-medium bg-desert-sand/10 p-4 rounded-2xl border border-desert-sand/30"
-            >
-              <div className="bg-[#25D366]/10 p-1.5 rounded-full shrink-0">
-                <Check size={16} className="text-[#25D366]" strokeWidth={3} />
-              </div>
-              <span>{item}</span>
-            </motion.li>
-          ))}
-        </ul>
+        {servicio.incluye.length > 0 && (
+          <>
+            <h2 className="text-xl font-black text-desert-night mb-4">¿Qué incluye?</h2>
+            <ul className="space-y-4 mb-6">
+              {servicio.incluye.map((item, idx) => (
+                <motion.li
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + (idx * 0.1) }}
+                  key={idx}
+                  className="flex items-center gap-3 text-desert-night font-medium bg-desert-sand/10 p-4 rounded-2xl border border-desert-sand/30"
+                >
+                  <div className="bg-[#25D366]/10 p-1.5 rounded-full shrink-0">
+                    <Check size={16} className="text-[#25D366]" strokeWidth={3} />
+                  </div>
+                  <span>{item}</span>
+                </motion.li>
+              ))}
+            </ul>
+          </>
+        )}
 
         <a
           href={`/resena/${servicio.id}`}
@@ -345,15 +376,27 @@ function DetalleServicioView({ servicio, onBack, resenas }) {
       </div>
 
       <div className="fixed bottom-0 w-full max-w-md px-6 py-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
-        <a
-          href={`https://wa.me/${servicio.telefono}?text=${encodeURIComponent(`Hola ${servicio.nombre}, vi tu perfil en Tatacoa Way y quiero preguntar por: ${servicio.especialidad}.`)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-4 rounded-full flex items-center justify-center gap-2 font-black text-lg shadow-desert-lg pointer-events-auto transition-transform active:scale-[0.98]"
-        >
-          <Phone size={22} strokeWidth={2.5} />
-          Contactar en WhatsApp
-        </a>
+        {servicio.telefono ? (
+          <a
+            href={`https://wa.me/${servicio.telefono}?text=${encodeURIComponent(`Hola ${servicio.nombre}, vi tu perfil en Tatacoa Way y quiero preguntar por: ${servicio.especialidad}.`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-4 rounded-full flex items-center justify-center gap-2 font-black text-lg shadow-desert-lg pointer-events-auto transition-transform active:scale-[0.98]"
+          >
+            <Phone size={22} strokeWidth={2.5} />
+            Contactar en WhatsApp
+          </a>
+        ) : servicio.lat != null ? (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${servicio.lat},${servicio.lon}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full bg-desert-night text-white py-4 rounded-full flex items-center justify-center gap-2 font-black text-lg shadow-desert-lg pointer-events-auto transition-transform active:scale-[0.98]"
+          >
+            <MapPin size={22} strokeWidth={2.5} />
+            Ver ubicación en Google Maps
+          </a>
+        ) : null}
       </div>
 
     </motion.div>
@@ -473,7 +516,7 @@ function MapaView({ servicios, resenas, onSelect }) {
             <Marker
               key={`servicio-${s.id}`}
               position={[s.lat, s.lon]}
-              icon={iconoServicioVerificado}
+              icon={s.verificado ? iconoServicioVerificado : iconoServicioSinVerificar}
               eventHandlers={{ click: () => abrirPunto({ id: `servicio-${s.id}`, nombre: s.nombre, categoria: 'servicio', pos: [s.lat, s.lon], servicio: s }) }}
             />
         ))}
@@ -500,24 +543,39 @@ function MapaView({ servicios, resenas, onSelect }) {
             transition={{ type: 'spring', damping: 30, stiffness: 280 }}
             className="absolute bottom-0 left-0 right-0 z-[500] bg-white rounded-t-[32px] p-6 pb-10 shadow-desert-lg"
           >
-            <button onClick={cerrarSheet} className="absolute top-5 right-5 p-2 rounded-full bg-desert-sand/40 text-desert-night">
+            <button onClick={cerrarSheet} className="absolute top-5 right-5 z-10 p-2 rounded-full bg-white/80 backdrop-blur-sm text-desert-night shadow-sm">
               <X size={16} strokeWidth={2.5} />
             </button>
 
-            <span className="text-[10px] font-black uppercase tracking-wider text-desert-earth block mb-1">
-              {seleccion.servicio ? 'Verificado · Tatacoa Way' : LABEL_CATEGORIA[seleccion.categoria]}
-            </span>
-            <h2 className="text-xl font-black text-desert-night mb-1 pr-8">{seleccion.nombre}</h2>
-            {seleccion.servicio && (
-              <div className="flex items-center gap-2 mb-3">
-                <p className="text-desert-stone text-sm font-medium">{seleccion.servicio.especialidad}</p>
-                <span className="w-1 h-1 rounded-full bg-desert-stone/50"></span>
-                <span className="flex items-center gap-1 text-sm font-bold text-desert-night">
-                  <Star size={13} className="fill-desert-earth text-desert-earth" />
-                  {calificacionDe(seleccion.servicio, resenas).valor}
-                </span>
+            {(seleccion.foto || seleccion.servicio?.fotoUrl) && (
+              <div className="-mx-6 -mt-6 mb-4 h-36 overflow-hidden">
+                <img src={seleccion.foto ?? seleccion.servicio.fotoUrl} alt={seleccion.nombre} className="w-full h-full object-cover" />
               </div>
             )}
+
+            <span className="text-[10px] font-black uppercase tracking-wider text-desert-earth block mb-1">
+              {seleccion.servicio
+                ? (seleccion.servicio.verificado ? 'Verificado · Tatacoa Way' : 'Sin verificar aún')
+                : LABEL_CATEGORIA[seleccion.categoria]}
+            </span>
+            <h2 className="text-xl font-black text-desert-night mb-1 pr-8">{seleccion.nombre}</h2>
+            {seleccion.servicio && (() => {
+              const calificacion = calificacionDe(seleccion.servicio, resenas);
+              return (
+                <div className="flex items-center gap-2 mb-3">
+                  <p className="text-desert-stone text-sm font-medium">{seleccion.servicio.especialidad}</p>
+                  {calificacion.valor != null && (
+                    <>
+                      <span className="w-1 h-1 rounded-full bg-desert-stone/50"></span>
+                      <span className="flex items-center gap-1 text-sm font-bold text-desert-night">
+                        <Star size={13} className="fill-desert-earth text-desert-earth" />
+                        {calificacion.valor}
+                      </span>
+                    </>
+                  )}
+                </div>
+              );
+            })()}
 
             {!ruta && !cargandoRuta && (
               <div className="flex gap-3 mt-4">

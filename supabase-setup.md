@@ -114,4 +114,34 @@ update servicios set lat = 3.2192, lon = -75.2180 where id = 6;
 
 ---
 
-## 7. Avísame cuando termines todos los bloques de SQL y el usuario, para verificar que todo quedó bien antes de publicar los cambios.
+## 7. Permitir servicios sin teléfono o calificación todavía
+
+Son lugares reales que agregamos desde mapas abiertos, pendientes de que el semillero los verifique. No se inventa un teléfono ni una calificación que no existen.
+
+```sql
+alter table servicios alter column telefono drop not null;
+alter table servicios alter column rating_inicial drop not null;
+```
+
+---
+
+## 8. Agregar 11 lugares reales nuevos (sin verificar todavía)
+
+```sql
+insert into servicios (nombre, especialidad, categoria, verificado, foto_url, telefono, descripcion, precio, incluye, rating_inicial, lat, lon) values
+('Hostal Laberintos Del Cuzco', 'Hospedaje en el desierto', 'Hospedaje', false, '/img/hostal-laberintos.jpg', null, 'Hospedaje ubicado en pleno Desierto Rojo (El Cuzco), a pocos minutos del Observatorio Astronómico. Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.23335, -75.16905),
+('Finca El Cuzco', 'Hospedaje rural', 'Hospedaje', false, '/img/finca-cuzco.jpg', null, 'Finca de hospedaje en la zona del Cuzco, dentro del desierto. Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.22941, -75.16251),
+('Hostal La Tranquilidad', 'Camping en el desierto', 'Hospedaje', false, '/img/hostal-tranquilidad.jpg', null, 'Zona de camping en el Desierto Rojo, cerca del Observatorio. Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.23322, -75.15865),
+('Bethel Bio Luxury Hotel', 'Hospedaje boutique', 'Hospedaje', false, '/img/bethel-hotel.jpg', '573125377071', 'Hotel boutique en la zona de Los Hoyos (desierto gris). Aún no verificado por el semillero, pero cuenta con contacto público.', 'Consulta precios en el lugar', '{}', null, 3.25026, -75.12879),
+('Yararaka Boutique Hotel', 'Hospedaje en Villavieja', 'Hospedaje', false, '/img/yararaka-hotel.jpg', null, 'Hotel boutique en el centro de Villavieja, el pueblo de entrada al desierto. Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.22034, -75.21817),
+('El Rincón del Cabrito', 'Comida típica huilense', 'Gastronomía', false, '/img/rincon-cabrito.jpg', null, 'Restaurante en la zona del Cuzco especializado en cabrito, el plato insignia de la región. Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.23330, -75.16187),
+('Estadero El Deseo', 'Comida típica', 'Gastronomía', false, '/img/estadero-deseo.jpg', null, 'Estadero dentro del desierto, cerca del Observatorio. Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.23397, -75.16881),
+('Sol y Luna', 'Comida típica', 'Gastronomía', false, '/img/sol-y-luna.jpg', null, 'Restaurante en la zona del Cuzco. Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.23262, -75.15842),
+('Oasis del Mesón', 'Comida típica', 'Gastronomía', false, '/img/oasis-meson.jpg', null, 'Restaurante en la zona de Los Hoyos (desierto gris). Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.26628, -75.12731),
+('Sol Picante', 'Comida típica', 'Gastronomía', false, '/img/sol-picante.jpg', null, 'Restaurante en la zona de Los Hoyos (desierto gris). Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.21937, -75.13570),
+('Tatacoa Fusión', 'Cocina fusión', 'Gastronomía', false, '/img/tatacoa-fusion.jpg', null, 'Restaurante en el centro de Villavieja. Aún no verificado por el semillero.', 'Consulta precios en el lugar', '{}', null, 3.21943, -75.21772);
+```
+
+---
+
+## 9. Avísame cuando termines todos los bloques de SQL y el usuario, para verificar que todo quedó bien antes de publicar los cambios.
