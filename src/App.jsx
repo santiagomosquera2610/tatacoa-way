@@ -6,6 +6,9 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { DescubreView } from './DescubreView';
 import { CondicionesCielo } from './CondicionesCielo';
+import { SERVICIOS_BD } from './ServiciosData';
+import { useResenas } from './useResenas';
+import { calificacionDe } from './ratingUtils';
 
 // Arreglar ícono Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -23,65 +26,14 @@ const userIcon = L.divIcon({
   iconAnchor: [16, 16]
 });
 
-// BASE DE DATOS MOCK
-const SERVICIOS_BD = [
-  { 
-    id: 1, nombre: "Carlos Ramírez", especialidad: "Tour Astronómico", verificado: true, categoria: "Guías",
-    fotoUrl: "/img/cielo-tatacoa.jpg", telefono: "573157429618",
-    descripcion: "Guía local certificado por el observatorio. Conmigo aprenderás a leer las estrellas y constelaciones aprovechando los cielos despejados de la Tatacoa. Incluye uso de telescopio profesional.",
-    precio: "$40.000 COP / pers",
-    incluye: ["Charla astronómica de 2 horas", "Telescopio profesional", "Fotografía estelar con celular"],
-    rating: 4.9
-  },
-  { 
-    id: 2, nombre: "María Gómez", especialidad: "Ruta del Cuzco", verificado: true, categoria: "Guías",
-    fotoUrl: "/img/desierto-rojo.jpg", telefono: "573122894475",
-    descripcion: "Recorrido inmersivo por el laberinto del Desierto Rojo (Cuzco). Te contaré la historia geológica y te mostraré las formaciones más impresionantes para tus fotos.",
-    precio: "$35.000 COP / grupo",
-    incluye: ["Recorrido guiado de 2.5h", "Hidratación básica", "Paradas fotográficas"],
-    rating: 4.8
-  },
-  { 
-    id: 3, nombre: "Asoc. Villavieja", especialidad: "Transporte Neiva", verificado: true, categoria: "Transporte",
-    fotoUrl: "/img/chiva-transporte.jpg", telefono: "573015567823",
-    descripcion: "Cooperativa oficial de transporte. Te recogemos en el terminal de Neiva o el aeropuerto y te llevamos directo a tu hostal en el desierto con total seguridad.",
-    precio: "$25.000 COP / tray",
-    incluye: ["Aire acondicionado", "Seguro de viaje", "Conductor local"],
-    rating: 4.7
-  },
-  { 
-    id: 4, nombre: "TukTuk Tatacoa", especialidad: "Movilidad desierto", verificado: true, categoria: "Transporte",
-    fotoUrl: "/img/motocarro-tatacoa.jpg", telefono: "573186240957",
-    descripcion: "El transporte más divertido para moverte entre Los Hoyos y El Cuzco. Disfruta de la brisa mientras te llevamos.",
-    precio: "$15.000 COP / viaje",
-    incluye: ["Capacidad 3 personas", "Paseo panorámico", "Música a bordo"],
-    rating: 4.9
-  },
-  { 
-    id: 5, nombre: "Hostal Saturno", especialidad: "Camping y Cabañas", verificado: true, categoria: "Hospedaje",
-    fotoUrl: "/img/glamping-desierto.jpg", telefono: "573204478129",
-    descripcion: "Descansa bajo las estrellas. Ofrecemos cabañas ecológicas y alquiler de carpas listas para usar. Tenemos piscina para refrescarte del calor del mediodía.",
-    precio: "Desde $30.000",
-    incluye: ["Acceso a piscina", "Baños compartidos", "Restaurante local"],
-    rating: 4.5
-  },
-  { 
-    id: 6, nombre: "Rest. El Oasis", especialidad: "Platos típicos", verificado: true, categoria: "Gastronomía",
-    fotoUrl: "/img/achiras-huila.jpg", telefono: "573139902264",
-    descripcion: "Parada obligatoria para almorzar. Nuestro plato estrella es el estofado de chivo tradicional de la región, acompañado de jugo de cactus local.",
-    precio: "Desde $25.000",
-    incluye: ["Comida típica", "Opciones vegetarianas", "Refrescos helados"],
-    rating: 4.8
-  },
-];
-
 export default function App() {
   const [activeTab, setActiveTab] = useState('descubre');
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
+  const { agregados } = useResenas();
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'directorio': return <DirectorioView onSelect={setItemSeleccionado} />;
+      case 'directorio': return <DirectorioView onSelect={setItemSeleccionado} resenas={agregados} />;
       case 'mapa': return <MapaView />;
       case 'descubre': return <DescubreView />;
       default: return null;
@@ -94,10 +46,11 @@ export default function App() {
         
         <AnimatePresence mode="wait">
           {itemSeleccionado ? (
-            <DetalleServicioView 
-              key="detalle" 
-              servicio={itemSeleccionado} 
-              onBack={() => setItemSeleccionado(null)} 
+            <DetalleServicioView
+              key="detalle"
+              servicio={itemSeleccionado}
+              onBack={() => setItemSeleccionado(null)}
+              resenas={agregados}
             />
           ) : (
             <motion.div 
@@ -163,14 +116,14 @@ const FILTROS_RATING = [
   { label: '4.8+', min: 4.8 },
 ];
 
-function DirectorioView({ onSelect }) {
+function DirectorioView({ onSelect, resenas }) {
   const [filtro, setFiltro] = useState('Todos');
   const [ratingMin, setRatingMin] = useState(0);
   const categorias = ['Todos', 'Guías', 'Transporte', 'Hospedaje', 'Gastronomía'];
 
   const serviciosFiltrados = SERVICIOS_BD
     .filter(s => filtro === 'Todos' || s.categoria === filtro)
-    .filter(s => s.rating >= ratingMin);
+    .filter(s => calificacionDe(s, resenas).valor >= ratingMin);
 
   return (
     <div className="h-full overflow-y-auto px-6 pb-32 scrollbar-hide">
@@ -224,8 +177,10 @@ function DirectorioView({ onSelect }) {
       )}
 
       <div className="flex flex-col gap-5">
-        {serviciosFiltrados.map((servicio, i) => (
-          <motion.div 
+        {serviciosFiltrados.map((servicio, i) => {
+          const calificacion = calificacionDe(servicio, resenas);
+          return (
+          <motion.div
             key={servicio.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -239,7 +194,7 @@ function DirectorioView({ onSelect }) {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"></div>
                 <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
                   <Star size={10} className="text-desert-earth fill-current" />
-                  <span className="text-[10px] font-bold text-desert-night">{servicio.rating}</span>
+                  <span className="text-[10px] font-bold text-desert-night">{calificacion.valor}</span>
                 </div>
               </div>
               <div className="py-2 pr-3 flex-1 flex flex-col justify-center min-w-0">
@@ -260,13 +215,15 @@ function DirectorioView({ onSelect }) {
               </div>
             </div>
           </motion.div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
 }
 
-function DetalleServicioView({ servicio, onBack }) {
+function DetalleServicioView({ servicio, onBack, resenas }) {
+  const calificacion = calificacionDe(servicio, resenas);
   return (
     <motion.div 
       initial={{ opacity: 0, x: '100%' }}
@@ -302,8 +259,9 @@ function DetalleServicioView({ servicio, onBack }) {
           <div className="flex flex-col gap-1">
             <span className="text-sm text-desert-stone font-medium">Valoración</span>
             <div className="flex items-center text-desert-night font-black text-xl gap-1">
-              <Star size={20} className="fill-desert-earth text-desert-earth" /> {servicio.rating}
+              <Star size={20} className="fill-desert-earth text-desert-earth" /> {calificacion.valor}
             </div>
+            <span className="text-[11px] text-desert-stone font-medium">{calificacion.detalle}</span>
           </div>
           <div className="w-px bg-desert-sand/50"></div>
           <div className="flex flex-col gap-1">
@@ -334,6 +292,14 @@ function DetalleServicioView({ servicio, onBack }) {
             </motion.li>
           ))}
         </ul>
+
+        <a
+          href={`/resena/${servicio.id}`}
+          className="flex items-center justify-center gap-2 text-desert-earth font-bold text-sm py-3 border border-desert-sand rounded-2xl hover:bg-desert-sand/10 transition-colors"
+        >
+          <Star size={15} />
+          ¿Ya usaste este servicio? Déjale tu reseña
+        </a>
       </div>
 
       <div className="fixed bottom-0 w-full max-w-md px-6 py-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
