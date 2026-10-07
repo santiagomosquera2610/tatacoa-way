@@ -43,7 +43,11 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex justify-center selection:bg-desert-earth selection:text-white">
       <div className="w-full max-w-md bg-[#FDFBF7] relative overflow-hidden flex flex-col h-[100dvh] shadow-2xl border-x border-desert-sand/30">
-        
+
+        <span className="absolute top-3 right-4 z-[300] bg-white/80 backdrop-blur-sm border border-desert-earth/30 text-desert-earth text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full pointer-events-none">
+          Beta
+        </span>
+
         <AnimatePresence mode="wait">
           {itemSeleccionado ? (
             <DetalleServicioView
