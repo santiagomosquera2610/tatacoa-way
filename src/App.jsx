@@ -43,7 +43,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 3, nombre: "Asoc. Villavieja", especialidad: "Transporte Neiva", verificado: true, categoria: "Transporte",
-    fotoUrl: "/img/atardecer-tatacoa.jpg", telefono: "573015567823",
+    fotoUrl: "/img/chiva-transporte.jpg", telefono: "573015567823",
     descripcion: "Cooperativa oficial de transporte. Te recogemos en el terminal de Neiva o el aeropuerto y te llevamos directo a tu hostal en el desierto con total seguridad.",
     precio: "$25.000 COP / tray",
     incluye: ["Aire acondicionado", "Seguro de viaje", "Conductor local"],
@@ -51,7 +51,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 4, nombre: "TukTuk Tatacoa", especialidad: "Movilidad desierto", verificado: true, categoria: "Transporte",
-    fotoUrl: "/img/los-hoyos.jpg", telefono: "573186240957",
+    fotoUrl: "/img/motocarro-tatacoa.jpg", telefono: "573186240957",
     descripcion: "El transporte más divertido para moverte entre Los Hoyos y El Cuzco. Disfruta de la brisa mientras te llevamos.",
     precio: "$15.000 COP / viaje",
     incluye: ["Capacidad 3 personas", "Paseo panorámico", "Música a bordo"],
@@ -59,7 +59,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 5, nombre: "Hostal Saturno", especialidad: "Camping y Cabañas", verificado: true, categoria: "Hospedaje",
-    fotoUrl: "/img/cordillera-andes.jpg", telefono: "573204478129",
+    fotoUrl: "/img/glamping-desierto.jpg", telefono: "573204478129",
     descripcion: "Descansa bajo las estrellas. Ofrecemos cabañas ecológicas y alquiler de carpas listas para usar. Tenemos piscina para refrescarte del calor del mediodía.",
     precio: "Desde $30.000",
     incluye: ["Acceso a piscina", "Baños compartidos", "Restaurante local"],
@@ -67,7 +67,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 6, nombre: "Rest. El Oasis", especialidad: "Platos típicos", verificado: true, categoria: "Gastronomía",
-    fotoUrl: "/img/bosque-tropical.jpg", telefono: "573139902264",
+    fotoUrl: "/img/achiras-huila.jpg", telefono: "573139902264",
     descripcion: "Parada obligatoria para almorzar. Nuestro plato estrella es el estofado de chivo tradicional de la región, acompañado de jugo de cactus local.",
     precio: "Desde $25.000",
     incluye: ["Comida típica", "Opciones vegetarianas", "Refrescos helados"],
@@ -157,11 +157,20 @@ export default function App() {
   );
 }
 
+const FILTROS_RATING = [
+  { label: 'Todas', min: 0 },
+  { label: '4.5+', min: 4.5 },
+  { label: '4.8+', min: 4.8 },
+];
+
 function DirectorioView({ onSelect }) {
   const [filtro, setFiltro] = useState('Todos');
+  const [ratingMin, setRatingMin] = useState(0);
   const categorias = ['Todos', 'Guías', 'Transporte', 'Hospedaje', 'Gastronomía'];
 
-  const serviciosFiltrados = SERVICIOS_BD.filter(s => filtro === 'Todos' || s.categoria === filtro);
+  const serviciosFiltrados = SERVICIOS_BD
+    .filter(s => filtro === 'Todos' || s.categoria === filtro)
+    .filter(s => s.rating >= ratingMin);
 
   return (
     <div className="h-full overflow-y-auto px-6 pb-32 scrollbar-hide">
@@ -188,8 +197,32 @@ function DirectorioView({ onSelect }) {
             </button>
           ))}
         </div>
+        <div className="flex gap-2 overflow-x-auto pt-1 scrollbar-hide">
+          {FILTROS_RATING.map(opt => (
+            <button
+              key={opt.label}
+              onClick={() => setRatingMin(opt.min)}
+              className={`flex items-center gap-1 px-3.5 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all duration-300 ${ratingMin === opt.min ? 'bg-desert-night text-white' : 'bg-transparent border border-desert-stone/30 text-desert-stone hover:border-desert-night/40 hover:text-desert-night'}`}
+            >
+              <Star size={11} className={ratingMin === opt.min ? 'fill-white' : 'fill-desert-stone/40'} strokeWidth={0} />
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
-      
+
+      {serviciosFiltrados.length === 0 && (
+        <div className="flex flex-col items-center text-center py-16 px-6">
+          <div className="bg-desert-sand/30 p-4 rounded-full mb-4">
+            <Star size={24} className="text-desert-earth" />
+          </div>
+          <p className="text-desert-night font-bold mb-1">Nada por aquí todavía</p>
+          <p className="text-desert-stone text-sm font-medium max-w-[240px]">
+            Prueba con otra categoría o baja el filtro de calificación mínima.
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-col gap-5">
         {serviciosFiltrados.map((servicio, i) => (
           <motion.div 
