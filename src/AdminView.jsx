@@ -417,6 +417,7 @@ function EmptyState({ icon: Icono, texto }) {
 const SERVICIO_VACIO = {
   nombre: '', especialidad: '', categoria: CATEGORIAS[0], verificado: true,
   fotoUrl: '', telefono: '', descripcion: '', precio: '', incluye: [], rating: 4.5,
+  lat: '', lon: '',
 };
 
 function ServiciosTab({ servicios, cargando, recargar, avisar, pedirConfirmacion }) {
@@ -521,6 +522,8 @@ function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
   const [form, setForm] = useState({
     ...servicio,
     incluyeTexto: (servicio.incluye ?? []).join(', '),
+    lat: servicio.lat ?? '',
+    lon: servicio.lon ?? '',
   });
   const [guardando, setGuardando] = useState(false);
 
@@ -535,6 +538,8 @@ function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
       ...form,
       incluye: form.incluyeTexto.split(',').map(s => s.trim()).filter(Boolean),
       rating: Number(form.rating),
+      lat: form.lat === '' ? null : Number(form.lat),
+      lon: form.lon === '' ? null : Number(form.lon),
     };
     if (esNuevo) {
       await crearServicio(datos);
@@ -619,6 +624,12 @@ function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
 
         <Campo label="Incluye (separado por comas)" value={form.incluyeTexto} onChange={v => campo('incluyeTexto', v)} />
         <Campo label="Calificación inicial (1-5)" type="number" step="0.1" min="1" max="5" value={form.rating} onChange={v => campo('rating', v)} required />
+
+        <div className="grid grid-cols-2 gap-3">
+          <Campo label="Latitud" type="number" step="0.0001" value={form.lat} onChange={v => campo('lat', v)} placeholder="3.2340" />
+          <Campo label="Longitud" type="number" step="0.0001" value={form.lon} onChange={v => campo('lon', v)} placeholder="-75.1700" />
+        </div>
+        <p className="text-xs text-desert-stone -mt-2">Para ubicarlo en el Mapa. Déjalo vacío si no quieres que aparezca ahí.</p>
 
         <div className="flex gap-3 mt-2">
           <button type="button" onClick={onClose} className="flex-1 bg-desert-sand/40 text-desert-night font-bold py-3 rounded-full active:scale-95 transition-transform">

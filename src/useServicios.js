@@ -15,6 +15,8 @@ function aCamelCase(fila) {
     precio: fila.precio,
     incluye: fila.incluye ?? [],
     rating: fila.rating_inicial,
+    lat: fila.lat,
+    lon: fila.lon,
   };
 }
 
@@ -30,6 +32,8 @@ function aSnakeCase(servicio) {
     precio: servicio.precio,
     incluye: servicio.incluye,
     rating_inicial: servicio.rating,
+    lat: servicio.lat,
+    lon: servicio.lon,
   };
 }
 

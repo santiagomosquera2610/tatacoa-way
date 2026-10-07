@@ -98,4 +98,20 @@ En Supabase (no por SQL): **Authentication → Users → Add user**. Pon tu emai
 
 ---
 
-## 6. Avísame cuando termines los 4 bloques de SQL y el usuario, para verificar que todo quedó bien antes de publicar los cambios.
+## 6. Agregar ubicación real a los servicios (para que salgan en el Mapa)
+
+```sql
+alter table servicios add column lat double precision;
+alter table servicios add column lon double precision;
+
+update servicios set lat = 3.2340, lon = -75.1700 where id = 1;
+update servicios set lat = 3.2320, lon = -75.1690 where id = 2;
+update servicios set lat = 3.2195, lon = -75.2188 where id = 3;
+update servicios set lat = 3.2330, lon = -75.1670 where id = 4;
+update servicios set lat = 3.2345, lon = -75.1670 where id = 5;
+update servicios set lat = 3.2192, lon = -75.2180 where id = 6;
+```
+
+---
+
+## 7. Avísame cuando termines todos los bloques de SQL y el usuario, para verificar que todo quedó bien antes de publicar los cambios.

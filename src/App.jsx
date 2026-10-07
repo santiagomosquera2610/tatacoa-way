@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Map, List, Phone, CheckCircle, Info, Navigation, ArrowLeft, Star, Clock, Check, MapPin, Compass } from 'lucide-react';
+import { Map, List, Phone, CheckCircle, Info, Navigation, ArrowLeft, Star, Clock, Check, MapPin, Compass, PersonStanding, Car, Route, X, ChevronRight, Timer } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import { motion, AnimatePresence } from 'motion/react';
 import 'leaflet/dist/leaflet.css';
@@ -8,7 +8,9 @@ import { DescubreView } from './DescubreView';
 import { CondicionesCielo } from './CondicionesCielo';
 import { useResenas } from './useResenas';
 import { useServicios } from './useServicios';
+import { useRuta } from './useRuta';
 import { calificacionDe } from './ratingUtils';
+import { PUNTOS_INTERES, ORIGEN_DEFECTO } from './PuntosInteresData';
 
 // Arreglar ícono Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -26,6 +28,41 @@ const userIcon = L.divIcon({
   iconAnchor: [16, 16]
 });
 
+// Íconos de categoría para puntos de interés
+const COLOR_CATEGORIA = {
+  atractivo: '#c86343',
+  hospedaje: '#6366f1',
+  restaurante: '#f59e0b',
+  servicio: '#475569',
+};
+
+const LABEL_CATEGORIA = {
+  atractivo: 'Atractivo',
+  hospedaje: 'Hospedaje',
+  restaurante: 'Restaurante',
+  servicio: 'Servicio',
+};
+
+function crearIconoPoi(color) {
+  return L.divIcon({
+    className: 'bg-transparent border-none',
+    html: `<div style="background:${color}" class="w-5 h-5 rounded-full border-2 border-white shadow-md"></div>`,
+    iconSize: [20, 20],
+    iconAnchor: [10, 10],
+  });
+}
+
+const ICONOS_CATEGORIA = Object.fromEntries(
+  Object.entries(COLOR_CATEGORIA).map(([cat, color]) => [cat, crearIconoPoi(color)])
+);
+
+const iconoServicioVerificado = L.divIcon({
+  className: 'bg-transparent border-none',
+  html: `<div class="w-7 h-7 rounded-full bg-[#25D366] border-2 border-white shadow-lg flex items-center justify-center text-white font-black text-xs">✓</div>`,
+  iconSize: [28, 28],
+  iconAnchor: [14, 20],
+});
+
 export default function App() {
   const [activeTab, setActiveTab] = useState('descubre');
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
@@ -35,7 +72,7 @@ export default function App() {
   const renderContent = () => {
     switch (activeTab) {
       case 'directorio': return <DirectorioView onSelect={setItemSeleccionado} resenas={agregados} servicios={servicios} />;
-      case 'mapa': return <MapaView />;
+      case 'mapa': return <MapaView servicios={servicios} resenas={agregados} onSelect={setItemSeleccionado} />;
       case 'descubre': return <DescubreView />;
       default: return null;
     }
@@ -323,22 +360,30 @@ function DetalleServicioView({ servicio, onBack, resenas }) {
   );
 }
 
-function MapaView() {
+const CATEGORIAS_MAPA = [
+  { id: 'Todos', label: 'Todos' },
+  { id: 'atractivo', label: 'Atractivos' },
+  { id: 'hospedaje', label: 'Hospedaje' },
+  { id: 'restaurante', label: 'Comida' },
+  { id: 'servicio', label: 'Servicios' },
+];
+
+function MapaView({ servicios, resenas, onSelect }) {
   const tatacoaCenter = [3.2359, -75.1700];
   const [userLocation, setUserLocation] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
+  const [filtroMapa, setFiltroMapa] = useState('Todos');
+  const [seleccion, setSeleccion] = useState(null);
+  const [perfil, setPerfil] = useState('pie');
+  const { ruta, cargando: cargandoRuta, error: errorRuta, calcularRuta, limpiarRuta } = useRuta();
 
-  const marcadores = [
-    { id: 1, pos: [3.2350, -75.1720], nombre: "Cuzco (Desierto Rojo)" },
-    { id: 2, pos: [3.2200, -75.1500], nombre: "Los Hoyos (Gris)" },
-    { id: 3, pos: [3.2380, -75.1680], nombre: "Observatorio" },
-  ];
+  const puntosFiltrados = filtroMapa === 'Todos'
+    ? PUNTOS_INTERES
+    : PUNTOS_INTERES.filter(p => p.categoria === filtroMapa);
 
-  const rutaSegura = [
-    [3.2380, -75.1680],
-    [3.2350, -75.1720],
-    [3.2200, -75.1500],
-  ];
+  const origenActual = userLocation
+    ? { nombre: 'Tu ubicación', pos: userLocation }
+    : ORIGEN_DEFECTO;
 
   const requestLocation = () => {
     setIsLocating(true);
@@ -361,14 +406,33 @@ function MapaView() {
     }
   };
 
+  function abrirPunto(punto) {
+    limpiarRuta();
+    setSeleccion(punto);
+  }
+
+  function cerrarSheet() {
+    setSeleccion(null);
+    limpiarRuta();
+  }
+
+  async function handleComoLlegar(nuevoPerfil) {
+    setPerfil(nuevoPerfil);
+    await calcularRuta(origenActual.pos, seleccion.pos, nuevoPerfil);
+  }
+
   return (
     <div className="animate-in fade-in duration-300 h-full flex flex-col relative bg-[#FDFBF7]">
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[400] w-[85%] bg-white/90 backdrop-blur-xl p-3.5 rounded-2xl shadow-desert-md border border-white">
-        <h2 className="text-sm font-black text-desert-night mb-0.5 text-center flex justify-center items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-          Ruta Segura Activa
-        </h2>
-        <p className="text-xs text-desert-stone text-center font-medium">Sigue la línea azul para no perderte</p>
+      <div className="absolute top-6 left-0 right-0 z-[400] px-6 flex gap-2 overflow-x-auto scrollbar-hide">
+        {CATEGORIAS_MAPA.map(c => (
+          <button
+            key={c.id}
+            onClick={() => setFiltroMapa(c.id)}
+            className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap shadow-desert-sm transition-all ${filtroMapa === c.id ? 'bg-desert-night text-white' : 'bg-white/90 backdrop-blur-xl text-desert-stone border border-white'}`}
+          >
+            {c.label}
+          </button>
+        ))}
       </div>
 
       <button
@@ -382,9 +446,9 @@ function MapaView() {
       <CondicionesCielo />
 
       <MapContainer
-        center={tatacoaCenter} 
-        zoom={14} 
-        scrollWheelZoom={true} 
+        center={tatacoaCenter}
+        zoom={14}
+        scrollWheelZoom={true}
         className="w-full h-full z-0"
         zoomControl={false}
       >
@@ -393,26 +457,147 @@ function MapaView() {
           attribution='&copy; OpenStreetMap'
           className="desert-map-tiles"
         />
-        
-        {marcadores.map(lugar => (
-          <Marker key={lugar.id} position={lugar.pos}>
-            <Popup>
-              <strong className="text-desert-earth font-bold font-sans">{lugar.nombre}</strong>
-            </Popup>
-          </Marker>
+
+        {puntosFiltrados.map(punto => (
+          <Marker
+            key={punto.id}
+            position={punto.pos}
+            icon={ICONOS_CATEGORIA[punto.categoria]}
+            eventHandlers={{ click: () => abrirPunto(punto) }}
+          />
         ))}
 
-        <Polyline 
-          positions={rutaSegura} 
-          pathOptions={{ color: '#3b82f6', weight: 5, opacity: 0.8, dashArray: '12, 12', lineCap: 'round' }} 
-        />
+        {servicios
+          .filter(s => s.lat != null && s.lon != null)
+          .map(s => (
+            <Marker
+              key={`servicio-${s.id}`}
+              position={[s.lat, s.lon]}
+              icon={iconoServicioVerificado}
+              eventHandlers={{ click: () => abrirPunto({ id: `servicio-${s.id}`, nombre: s.nombre, categoria: 'servicio', pos: [s.lat, s.lon], servicio: s }) }}
+            />
+        ))}
+
+        {ruta && (
+          <>
+            <Polyline
+              positions={ruta.coordenadas}
+              pathOptions={{ color: '#3b82f6', weight: 5, opacity: 0.85, lineCap: 'round' }}
+            />
+            <AjustarVistaRuta coordenadas={ruta.coordenadas} />
+          </>
+        )}
+
         <UserLocationMarker location={userLocation} />
       </MapContainer>
+
+      <AnimatePresence>
+        {seleccion && (
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 280 }}
+            className="absolute bottom-0 left-0 right-0 z-[500] bg-white rounded-t-[32px] p-6 pb-10 shadow-desert-lg"
+          >
+            <button onClick={cerrarSheet} className="absolute top-5 right-5 p-2 rounded-full bg-desert-sand/40 text-desert-night">
+              <X size={16} strokeWidth={2.5} />
+            </button>
+
+            <span className="text-[10px] font-black uppercase tracking-wider text-desert-earth block mb-1">
+              {seleccion.servicio ? 'Verificado · Tatacoa Way' : LABEL_CATEGORIA[seleccion.categoria]}
+            </span>
+            <h2 className="text-xl font-black text-desert-night mb-1 pr-8">{seleccion.nombre}</h2>
+            {seleccion.servicio && (
+              <div className="flex items-center gap-2 mb-3">
+                <p className="text-desert-stone text-sm font-medium">{seleccion.servicio.especialidad}</p>
+                <span className="w-1 h-1 rounded-full bg-desert-stone/50"></span>
+                <span className="flex items-center gap-1 text-sm font-bold text-desert-night">
+                  <Star size={13} className="fill-desert-earth text-desert-earth" />
+                  {calificacionDe(seleccion.servicio, resenas).valor}
+                </span>
+              </div>
+            )}
+
+            {!ruta && !cargandoRuta && (
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={() => handleComoLlegar('pie')}
+                  className="flex-1 flex items-center justify-center gap-2 bg-desert-night text-white font-bold py-3 rounded-full active:scale-95 transition-transform"
+                >
+                  <PersonStanding size={18} /> A pie
+                </button>
+                <button
+                  onClick={() => handleComoLlegar('carro')}
+                  className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-desert-sand text-desert-night font-bold py-3 rounded-full active:scale-95 transition-transform"
+                >
+                  <Car size={18} /> En carro
+                </button>
+              </div>
+            )}
+
+            {cargandoRuta && (
+              <p className="text-desert-stone text-sm font-medium mt-4">Calculando la mejor ruta...</p>
+            )}
+
+            {errorRuta && (
+              <p className="text-desert-red text-sm font-medium mt-4">No se pudo calcular la ruta. Intenta de nuevo.</p>
+            )}
+
+            {ruta && (
+              <div className="mt-4">
+                <div className="flex items-center gap-4 bg-desert-sand/20 rounded-2xl p-4 mb-3">
+                  <div className="flex items-center gap-1.5 text-desert-night font-black">
+                    <Route size={16} className="text-desert-earth" /> {ruta.distanciaKm.toFixed(1)} km
+                  </div>
+                  <div className="w-px h-4 bg-desert-sand"></div>
+                  <div className="flex items-center gap-1.5 text-desert-night font-black">
+                    <Timer size={16} className="text-desert-earth" /> {Math.round(ruta.duracionMin)} min
+                  </div>
+                  <span className="text-desert-stone text-xs font-medium ml-auto">desde {origenActual.nombre}</span>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleComoLlegar('pie')}
+                    className={`flex-1 flex items-center justify-center gap-2 font-bold py-2.5 rounded-full text-sm active:scale-95 transition-transform ${perfil === 'pie' ? 'bg-desert-night text-white' : 'bg-white border-2 border-desert-sand text-desert-night'}`}
+                  >
+                    <PersonStanding size={16} /> A pie
+                  </button>
+                  <button
+                    onClick={() => handleComoLlegar('carro')}
+                    className={`flex-1 flex items-center justify-center gap-2 font-bold py-2.5 rounded-full text-sm active:scale-95 transition-transform ${perfil === 'carro' ? 'bg-desert-night text-white' : 'bg-white border-2 border-desert-sand text-desert-night'}`}
+                  >
+                    <Car size={16} /> En carro
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {seleccion.servicio && (
+              <button
+                onClick={() => onSelect(seleccion.servicio)}
+                className="flex items-center justify-center gap-2 w-full mt-3 text-desert-earth font-bold text-sm py-3"
+              >
+                Ver detalle en el Directorio <ChevronRight size={15} />
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
 
-// Componente oculto pero necesario para Leaflet en este archivo (o puedes moverlo)
+function AjustarVistaRuta({ coordenadas }) {
+  const map = useMap();
+  useEffect(() => {
+    if (coordenadas?.length) {
+      map.fitBounds(L.latLngBounds(coordenadas), { padding: [60, 60] });
+    }
+  }, [coordenadas, map]);
+  return null;
+}
+
 function UserLocationMarker({ location }) {
   const map = useMap();
   useEffect(() => {
