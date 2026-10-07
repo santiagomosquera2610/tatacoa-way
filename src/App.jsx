@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { DescubreView } from './DescubreView';
+import { CondicionesCielo } from './CondicionesCielo';
 
 // Arreglar ícono Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -360,7 +361,7 @@ function MapaView() {
         <p className="text-xs text-desert-stone text-center font-medium">Sigue la línea azul para no perderte</p>
       </div>
 
-      <button 
+      <button
         onClick={requestLocation}
         className={`absolute bottom-32 right-6 z-[400] bg-white p-4 rounded-full shadow-xl border-2 transition-all ${isLocating ? 'border-desert-earth animate-pulse' : 'border-blue-500 hover:bg-blue-50'}`}
         title="Mi Ubicación"
@@ -368,7 +369,9 @@ function MapaView() {
         <Navigation size={26} className={isLocating ? 'text-desert-earth' : 'text-blue-600'} />
       </button>
 
-      <MapContainer 
+      <CondicionesCielo />
+
+      <MapContainer
         center={tatacoaCenter} 
         zoom={14} 
         scrollWheelZoom={true} 

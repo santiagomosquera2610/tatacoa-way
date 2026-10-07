@@ -1,5 +1,9 @@
 import { motion } from 'motion/react';
+import { Trash2, Footprints, PawPrint, Droplets } from 'lucide-react';
 import { HISTORIA_TATACOA } from './HistoriaData';
+import { BUENAS_PRACTICAS } from './EducacionData';
+
+const ICONOS = { Trash2, Footprints, PawPrint, Droplets };
 
 export function DescubreView() {
   return (
@@ -11,7 +15,7 @@ export function DescubreView() {
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 1.5, ease: "easeOut" }}
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/Desierto_de_la_Tatacoa_-_camilogaleano%28com%29.jpg/800px-Desierto_de_la_Tatacoa_-_camilogaleano%28com%29.jpg" 
+          src="/img/atardecer-tatacoa.jpg"
           alt="Desierto Tatacoa"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -78,6 +82,40 @@ export function DescubreView() {
           ))}
         </div>
 
+      </div>
+
+      {/* Educación Ambiental */}
+      <div className="px-6 mt-16">
+        <h2 className="text-2xl font-black text-desert-night mb-2">Cuida lo que ves</h2>
+        <p className="text-desert-stone font-medium text-sm max-w-[320px] mb-6">
+          Este ecosistema árido tardó millones de años en formarse. Así lo mantenemos intacto.
+        </p>
+
+        <div className="grid grid-cols-2 gap-4">
+          {BUENAS_PRACTICAS.map((item, i) => {
+            const Icono = ICONOS[item.icono];
+            return (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.5, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
+                className={`rounded-3xl p-5 ${item.bg} border border-black/5`}
+              >
+                <div className="bg-white/70 w-10 h-10 rounded-xl flex items-center justify-center mb-4">
+                  <Icono size={20} className={item.color} strokeWidth={2} />
+                </div>
+                <h3 className="font-black text-desert-night text-sm leading-tight mb-2">
+                  {item.titulo}
+                </h3>
+                <p className="text-desert-stone text-xs leading-relaxed font-medium">
+                  {item.texto}
+                </p>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
 
     </div>
