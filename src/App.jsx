@@ -27,7 +27,7 @@ const userIcon = L.divIcon({
 const SERVICIOS_BD = [
   { 
     id: 1, nombre: "Carlos Ramírez", especialidad: "Tour Astronómico", verificado: true, categoria: "Guías",
-    fotoUrl: "/img/cielo-tatacoa.jpg",
+    fotoUrl: "/img/cielo-tatacoa.jpg", telefono: "573157429618",
     descripcion: "Guía local certificado por el observatorio. Conmigo aprenderás a leer las estrellas y constelaciones aprovechando los cielos despejados de la Tatacoa. Incluye uso de telescopio profesional.",
     precio: "$40.000 COP / pers",
     incluye: ["Charla astronómica de 2 horas", "Telescopio profesional", "Fotografía estelar con celular"],
@@ -35,7 +35,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 2, nombre: "María Gómez", especialidad: "Ruta del Cuzco", verificado: true, categoria: "Guías",
-    fotoUrl: "/img/desierto-rojo.jpg",
+    fotoUrl: "/img/desierto-rojo.jpg", telefono: "573122894475",
     descripcion: "Recorrido inmersivo por el laberinto del Desierto Rojo (Cuzco). Te contaré la historia geológica y te mostraré las formaciones más impresionantes para tus fotos.",
     precio: "$35.000 COP / grupo",
     incluye: ["Recorrido guiado de 2.5h", "Hidratación básica", "Paradas fotográficas"],
@@ -43,7 +43,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 3, nombre: "Asoc. Villavieja", especialidad: "Transporte Neiva", verificado: true, categoria: "Transporte",
-    fotoUrl: "/img/atardecer-tatacoa.jpg",
+    fotoUrl: "/img/atardecer-tatacoa.jpg", telefono: "573015567823",
     descripcion: "Cooperativa oficial de transporte. Te recogemos en el terminal de Neiva o el aeropuerto y te llevamos directo a tu hostal en el desierto con total seguridad.",
     precio: "$25.000 COP / tray",
     incluye: ["Aire acondicionado", "Seguro de viaje", "Conductor local"],
@@ -51,7 +51,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 4, nombre: "TukTuk Tatacoa", especialidad: "Movilidad desierto", verificado: true, categoria: "Transporte",
-    fotoUrl: "/img/los-hoyos.jpg",
+    fotoUrl: "/img/los-hoyos.jpg", telefono: "573186240957",
     descripcion: "El transporte más divertido para moverte entre Los Hoyos y El Cuzco. Disfruta de la brisa mientras te llevamos.",
     precio: "$15.000 COP / viaje",
     incluye: ["Capacidad 3 personas", "Paseo panorámico", "Música a bordo"],
@@ -59,7 +59,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 5, nombre: "Hostal Saturno", especialidad: "Camping y Cabañas", verificado: true, categoria: "Hospedaje",
-    fotoUrl: "/img/cordillera-andes.jpg",
+    fotoUrl: "/img/cordillera-andes.jpg", telefono: "573204478129",
     descripcion: "Descansa bajo las estrellas. Ofrecemos cabañas ecológicas y alquiler de carpas listas para usar. Tenemos piscina para refrescarte del calor del mediodía.",
     precio: "Desde $30.000",
     incluye: ["Acceso a piscina", "Baños compartidos", "Restaurante local"],
@@ -67,7 +67,7 @@ const SERVICIOS_BD = [
   },
   { 
     id: 6, nombre: "Rest. El Oasis", especialidad: "Platos típicos", verificado: true, categoria: "Gastronomía",
-    fotoUrl: "/img/bosque-tropical.jpg",
+    fotoUrl: "/img/bosque-tropical.jpg", telefono: "573139902264",
     descripcion: "Parada obligatoria para almorzar. Nuestro plato estrella es el estofado de chivo tradicional de la región, acompañado de jugo de cactus local.",
     precio: "Desde $25.000",
     incluye: ["Comida típica", "Opciones vegetarianas", "Refrescos helados"],
@@ -198,30 +198,31 @@ function DirectorioView({ onSelect }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05, ease: [0.16, 1, 0.3, 1] }}
             onClick={() => onSelect(servicio)}
-            className="bg-white rounded-[24px] p-2 shadow-desert-sm border border-white hover:border-desert-sand/80 transition-all cursor-pointer group active:scale-[0.98]"
+            className="bg-white rounded-[24px] p-2 shadow-desert-sm border border-white hover:border-desert-sand/80 hover:shadow-desert-md transition-all cursor-pointer group active:scale-[0.98]"
           >
             <div className="flex gap-4">
-              <div className="w-24 h-28 shrink-0 rounded-[18px] overflow-hidden bg-desert-sand relative">
+              <div className="w-28 h-32 shrink-0 rounded-[18px] overflow-hidden bg-desert-sand relative">
                 <img src={servicio.fotoUrl} alt={servicio.nombre} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent"></div>
                 <div className="absolute bottom-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
                   <Star size={10} className="text-desert-earth fill-current" />
                   <span className="text-[10px] font-bold text-desert-night">{servicio.rating}</span>
                 </div>
               </div>
-              <div className="py-2 pr-3 flex flex-col justify-center">
+              <div className="py-2 pr-3 flex-1 flex flex-col justify-center min-w-0">
                 <span className="text-[10px] font-bold text-desert-earth uppercase tracking-wider mb-1">
                   {servicio.categoria}
                 </span>
                 <h3 className="font-black text-desert-night text-lg leading-tight flex items-center gap-1 mb-1">
-                  {servicio.nombre}
+                  <span className="truncate">{servicio.nombre}</span>
                   {servicio.verificado && <CheckCircle size={14} className="text-[#25D366] shrink-0" />}
                 </h3>
-                <p className="text-sm text-desert-stone font-medium line-clamp-1 mb-2">
+                <p className="text-sm text-desert-stone font-medium line-clamp-1 mb-3">
                   {servicio.especialidad}
                 </p>
-                <div className="text-[#25D366] text-xs font-bold flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] animate-pulse"></span>
-                  Disponible hoy
+                <div className="flex items-center justify-between gap-2 pt-3 border-t border-desert-sand/40">
+                  <span className="text-desert-night font-black text-sm truncate">{servicio.precio}</span>
+                  <ArrowLeft size={14} className="rotate-180 text-desert-stone group-hover:text-desert-earth group-hover:translate-x-0.5 transition-all shrink-0" />
                 </div>
               </div>
             </div>
@@ -303,10 +304,15 @@ function DetalleServicioView({ servicio, onBack }) {
       </div>
 
       <div className="fixed bottom-0 w-full max-w-md px-6 py-6 bg-gradient-to-t from-white via-white/95 to-transparent pointer-events-none">
-        <button className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-4 rounded-full flex items-center justify-center gap-2 font-black text-lg shadow-desert-lg pointer-events-auto transition-transform active:scale-[0.98]">
+        <a
+          href={`https://wa.me/${servicio.telefono}?text=${encodeURIComponent(`Hola ${servicio.nombre}, vi tu perfil en Tatacoa Way y quiero preguntar por: ${servicio.especialidad}.`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white py-4 rounded-full flex items-center justify-center gap-2 font-black text-lg shadow-desert-lg pointer-events-auto transition-transform active:scale-[0.98]"
+        >
           <Phone size={22} strokeWidth={2.5} />
           Contactar en WhatsApp
-        </button>
+        </a>
       </div>
 
     </motion.div>
