@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import { Star, MapPin, Check } from 'lucide-react';
 import { motion } from 'motion/react';
-import { SERVICIOS_BD } from './ServiciosData';
+import { useServicios } from './useServicios';
 import { enviarResena } from './useResenas';
 import { supabaseHabilitado } from './supabaseClient';
 
 export function ResenaView({ servicioId }) {
-  const servicio = SERVICIOS_BD.find(s => String(s.id) === String(servicioId));
+  const { servicios, cargando } = useServicios();
+  const servicio = servicios.find(s => String(s.id) === String(servicioId));
   const [calificacion, setCalificacion] = useState(0);
   const [hover, setHover] = useState(0);
   const [comentario, setComentario] = useState('');
@@ -18,6 +19,10 @@ export function ResenaView({ servicioId }) {
     setEstado('enviando');
     const { error } = await enviarResena({ servicioId: servicio.id, calificacion, comentario });
     setEstado(error ? 'error' : 'enviado');
+  }
+
+  if (cargando) {
+    return <div className="min-h-[100dvh] bg-[#FDFBF7]" />;
   }
 
   if (!servicio) {

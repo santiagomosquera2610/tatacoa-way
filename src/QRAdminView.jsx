@@ -1,8 +1,9 @@
 import { QRCodeSVG } from 'qrcode.react';
-import { SERVICIOS_BD } from './ServiciosData';
+import { useServicios } from './useServicios';
 
 export function QRAdminView() {
   const origen = window.location.origin;
+  const { servicios } = useServicios();
 
   return (
     <div className="min-h-[100dvh] bg-[#FDFBF7] p-8">
@@ -21,7 +22,7 @@ export function QRAdminView() {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {SERVICIOS_BD.map(servicio => (
+          {servicios.map(servicio => (
             <div
               key={servicio.id}
               className="bg-white rounded-3xl p-6 border border-desert-sand/50 shadow-desert-sm flex flex-col items-center text-center break-inside-avoid"

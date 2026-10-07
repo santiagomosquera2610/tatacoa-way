@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import { ResenaView } from './ResenaView.jsx'
-import { QRAdminView } from './QRAdminView.jsx'
+import { AdminView } from './AdminView.jsx'
 
 function Root() {
   const path = window.location.pathname;
@@ -12,8 +12,8 @@ function Root() {
   if (matchResena) {
     return <ResenaView servicioId={matchResena[1]} />;
   }
-  if (path === '/admin/qr') {
-    return <QRAdminView />;
+  if (path.startsWith('/admin')) {
+    return <AdminView />;
   }
   return <App />;
 }

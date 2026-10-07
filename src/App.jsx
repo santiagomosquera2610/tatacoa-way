@@ -6,8 +6,8 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { DescubreView } from './DescubreView';
 import { CondicionesCielo } from './CondicionesCielo';
-import { SERVICIOS_BD } from './ServiciosData';
 import { useResenas } from './useResenas';
+import { useServicios } from './useServicios';
 import { calificacionDe } from './ratingUtils';
 
 // Arreglar ícono Leaflet
@@ -30,10 +30,11 @@ export default function App() {
   const [activeTab, setActiveTab] = useState('descubre');
   const [itemSeleccionado, setItemSeleccionado] = useState(null);
   const { agregados } = useResenas();
+  const { servicios } = useServicios();
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'directorio': return <DirectorioView onSelect={setItemSeleccionado} resenas={agregados} />;
+      case 'directorio': return <DirectorioView onSelect={setItemSeleccionado} resenas={agregados} servicios={servicios} />;
       case 'mapa': return <MapaView />;
       case 'descubre': return <DescubreView />;
       default: return null;
@@ -120,12 +121,12 @@ const FILTROS_RATING = [
   { label: '4.8+', min: 4.8 },
 ];
 
-function DirectorioView({ onSelect, resenas }) {
+function DirectorioView({ onSelect, resenas, servicios }) {
   const [filtro, setFiltro] = useState('Todos');
   const [ratingMin, setRatingMin] = useState(0);
   const categorias = ['Todos', 'Guías', 'Transporte', 'Hospedaje', 'Gastronomía'];
 
-  const serviciosFiltrados = SERVICIOS_BD
+  const serviciosFiltrados = servicios
     .filter(s => filtro === 'Todos' || s.categoria === filtro)
     .filter(s => calificacionDe(s, resenas).valor >= ratingMin);
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase, supabaseHabilitado } from './supabaseClient';
 
 export function useResenas() {
@@ -50,5 +50,35 @@ export async function enviarResena({ servicioId, calificacion, comentario }) {
     comentario: comentario || null,
     aprobado: false,
   });
+  return { error: error?.message ?? null };
+}
+
+export function useResenasAdmin() {
+  const [resenas, setResenas] = useState([]);
+  const [cargando, setCargando] = useState(true);
+
+  const recargar = useCallback(async () => {
+    if (!supabaseHabilitado) return;
+    setCargando(true);
+    const { data, error } = await supabase
+      .from('resenas')
+      .select('*')
+      .order('creado_en', { ascending: false });
+    if (!error && data) setResenas(data);
+    setCargando(false);
+  }, []);
+
+  useEffect(() => { recargar(); }, [recargar]);
+
+  return { resenas, cargando, recargar };
+}
+
+export async function aprobarResena(id) {
+  const { error } = await supabase.from('resenas').update({ aprobado: true }).eq('id', id);
+  return { error: error?.message ?? null };
+}
+
+export async function rechazarResena(id) {
+  const { error } = await supabase.from('resenas').delete().eq('id', id);
   return { error: error?.message ?? null };
 }
