@@ -9,6 +9,12 @@
 - El botón de WhatsApp solo aparece en servicios verificados (PF-09); los no verificados muestran su ubicación en Google Maps.
 - `supabase-setup.md`, bloque 10 (opcional): borra `rating_inicial` de la base de datos.
 
+### Corrección 1.3 (segunda parte): portada prerenderizada
+- `npm run build` ahora genera el HTML de la portada al compilar (`src/entry-server.jsx` + `scripts/prerender.mjs`) y React lo hidrata: la foto principal y los textos se ven sin esperar al JavaScript.
+- `/admin` y `/resena/:id` reciben `app.html`, vacío (ver `vercel.json`), para no mostrar la portada en esas rutas.
+- Las fotos debajo de la portada se piden al primer scroll (o a los 4 s) para no quitarle red a la foto principal.
+- PageSpeed real tras la primera parte (17 nov, 8:09 p. m.): celular 96 (LCP 2,8 s), accesibilidad 100. Medición local con la portada prerenderizada (Lighthouse, modo simulado): celular 99–100 con LCP 1,9–2,0 s; escritorio 100 con LCP 0,4 s.
+
 ### Corrección 1.2: accesibilidad (Lighthouse celular: 87 → 100 en el inicio)
 - Nombre accesible en todos los botones de solo ícono: barra inferior (Descubre, Directorio, Mapa, con `aria-current`), volver, cerrar, ubicación ("Centrar el mapa en mi ubicación"), luna ("Ver clima y fase lunar"), estrellas de la reseña, editar y eliminar del panel, y los pines del mapa.
 - Contraste WCAG AA (≥ 4.5:1): gris de textos secundarios `#9ba09d` → `#5f6563`; terracota `#c86343` → `#a34b2b`; botón de WhatsApp `#25D366` (2.0:1 con texto blanco) → `#15803d`; textos oscuros semitransparentes subidos a 80 %.
@@ -42,7 +48,7 @@
 - "Imprimir todo" imprime solo las tarjetas QR.
 
 ### Pendiente
-- 1.3: confirmar LCP en PageSpeed después de publicar.
+- 1.3: confirmar en PageSpeed el LCP celular ≤ 2,5 s tras publicar la portada prerenderizada.
 - 2.1 Pantalla "Acerca de" (verificación, privacidad, créditos de todas las fotos).
 - Antes de la evaluación: quitar o desmarcar los 6 prestadores de ejemplo (Carlos Ramírez, María Gómez, Asoc. Villavieja, TukTuk Tatacoa, Hostal Saturno, Rest. El Oasis). Son datos de prueba, con teléfonos inventados.
 

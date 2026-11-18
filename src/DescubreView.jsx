@@ -1,10 +1,16 @@
-import { useRef, useState, useEffect, useLayoutEffect, createRef } from 'react';
+import { useRef, useState, useEffect, useLayoutEffect, createRef, createContext, useContext } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform, useSpring, useReducedMotion } from 'motion/react';
 import { Trash2, Footprints, PawPrint, Droplets, ChevronDown, ChevronRight, X, ExternalLink, Trees, ShieldCheck, Bone, Landmark, ScrollText, Hourglass } from 'lucide-react';
 import { HISTORIA_TATACOA } from './HistoriaData';
 import { BUENAS_PRACTICAS } from './EducacionData';
 import { CONTEXTO_TATACOA } from './ContextoData';
 import { Foto } from './Foto';
+
+// Las fotos que están debajo de la portada no se piden hasta que el turista
+// empieza a bajar (o pasan unos segundos): así no le quitan red a la foto
+// principal (LCP) en conexiones lentas. Mientras tanto se ve el color de
+// fondo de la tarjeta, con el mismo tamaño, sin saltos de layout.
+const FotosListas = createContext(false);
 
 const ICONOS = { Trash2, Footprints, PawPrint, Droplets, Trees, ShieldCheck, Bone, Landmark, ScrollText, Hourglass };
 
@@ -25,6 +31,18 @@ export function DescubreView() {
   const tarjetasRef = useRef([]);
   const siguienteSeccionRef = useRef(null);
   const reducir = useReducedMotion();
+  const [fotosListas, setFotosListas] = useState(false);
+
+  useEffect(() => {
+    const contenedor = scrollRef.current;
+    const activar = () => setFotosListas(true);
+    contenedor?.addEventListener('scroll', activar, { once: true, passive: true });
+    const respaldo = setTimeout(activar, 4000);
+    return () => {
+      contenedor?.removeEventListener('scroll', activar);
+      clearTimeout(respaldo);
+    };
+  }, []);
   const [abierto, setAbierto] = useState(null);
 
   const { scrollY } = useScroll({ container: scrollRef });
@@ -52,6 +70,7 @@ export function DescubreView() {
           />
         )}
 
+        <FotosListas.Provider value={fotosListas}>
         <Hero scrollRef={scrollRef} reducir={reducir} />
         <LineaDeTiempo
           scrollRef={scrollRef}
@@ -61,6 +80,7 @@ export function DescubreView() {
         />
         <MasAllaDelNombre scrollRef={scrollRef} reducir={reducir} refSeccion={siguienteSeccionRef} onAbrir={setAbierto} colorTexto={colorTexto} />
         <EducacionAmbiental reducir={reducir} />
+        </FotosListas.Provider>
       </motion.div>
 
       <AnimatePresence>
@@ -262,6 +282,7 @@ function LineaDeTiempo({ scrollRef, reducir, tarjetasRef, onAbrir }) {
 }
 
 function EventoHistoria({ evento, scrollRef, reducir, refTarjeta, onAbrir }) {
+  const fotosListas = useContext(FotosListas);
   const ref = useRef(null);
 
   // Recorrido completo de la tarjeta por la pantalla: 0 = entra por abajo,
@@ -323,13 +344,13 @@ function EventoHistoria({ evento, scrollRef, reducir, refTarjeta, onAbrir }) {
           className={`text-left w-full rounded-3xl overflow-hidden shadow-desert-md border border-black/5 ${evento.bg} active:scale-[0.98] transition-transform`}
         >
           <div className="h-40 w-full relative overflow-hidden">
-            <Foto
+            {fotosListas && <Foto
               como={motion.img}
               style={reducir ? undefined : { y: fotoY }}
               src={evento.imgUrl}
               alt=""
               className={`absolute inset-x-0 w-full object-cover ${reducir ? 'inset-y-0 h-full' : '-top-[12%] h-[124%]'}`}
-            />
+            />}
             {evento.dark && <div className="absolute inset-0 bg-black/40" />}
           </div>
           <motion.div
@@ -518,6 +539,7 @@ function MasAllaDelNombre({ scrollRef, reducir, refSeccion, onAbrir, colorTexto 
 }
 
 function TarjetaApilada({ item, indice, total, scrollRef, refPropia, refSiguiente, reducir, onAbrir }) {
+  const fotosListas = useContext(FotosListas);
   const Icono = IconoDe(item);
   const esUltima = indice === total - 1;
   const topFijo = 24 + indice * 14;
@@ -549,13 +571,13 @@ function TarjetaApilada({ item, indice, total, scrollRef, refPropia, refSiguient
       style={reducir ? undefined : { scale: escala }}
       className="relative block w-full h-[440px] text-left rounded-[28px] overflow-hidden shadow-desert-lg origin-top active:scale-[0.98] transition-transform bg-desert-night"
     >
-      <Foto
+      {fotosListas && <Foto
         como={motion.img}
         src={item.imgUrl}
         alt=""
         style={reducir ? undefined : { scale: zoomFoto }}
         className="absolute inset-0 w-full h-full object-cover"
-      />
+      />}
       <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/10" />
 
       <div className="absolute top-5 left-5 flex items-center gap-2 bg-white/90 backdrop-blur-md rounded-full pl-1.5 pr-3 py-1.5">

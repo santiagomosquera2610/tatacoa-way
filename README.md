@@ -21,7 +21,7 @@ Publicado en https://tatacoa-way.vercel.app
 
 ## Rutas
 
-El enrutamiento es manual en `src/main.jsx` (sin router); `vercel.json` redirige todo a `index.html`.
+El enrutamiento es manual en `src/main.jsx` (sin router). `vercel.json` sirve `app.html` en `/admin` y `/resena`, e `index.html` (con la portada prerenderizada) en el resto.
 
 | Ruta | Qué es |
 |---|---|
@@ -33,7 +33,10 @@ El enrutamiento es manual en `src/main.jsx` (sin router); `vercel.json` redirige
 
 | Archivo | Responsabilidad |
 |---|---|
-| `main.jsx` | Elige la vista según la ruta |
+| `main.jsx` | Elige la vista según la ruta; hidrata la portada prerenderizada |
+| `entry-server.jsx` | Render de la portada al compilar (prerenderizado) |
+| `Foto.jsx` | Imágenes WebP responsive (480/800/1200 px) con JPG de respaldo |
+| `MapaView.jsx` | Pestaña Mapa (Leaflet), cargada bajo demanda |
 | `App.jsx` | Shell de la app pública, barra inferior, Directorio, ficha de servicio y Mapa |
 | `DescubreView.jsx` | Narrativa con scroll: hero, línea del tiempo con cambio de color por época, sección "Más allá del nombre" (tarjetas apiladas), hoja "Leer más" y educación ambiental |
 | `HistoriaData.js` | Épocas de la línea del tiempo (texto, detalle ampliado, fuentes, foto, tono de fondo) |
@@ -64,7 +67,9 @@ Variables (también configuradas en Vercel):
 - `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`: sin ellas la app funciona en modo de respaldo con `ServiciosData.js`.
 - `VITE_URL_PUBLICA` (opcional): dirección a la que apuntan los QR. Por defecto, `https://tatacoa-way.vercel.app`.
 
-Otros comandos: `npm run build` (compilación de producción) y `npm run lint` (oxlint).
+Otros comandos: `npm run build` y `npm run lint` (oxlint).
+
+`npm run build` hace tres pasos: compila la app, compila `src/entry-server.jsx` para el servidor y ejecuta `scripts/prerender.mjs`, que escribe el HTML de la portada dentro de `dist/index.html` (React lo hidrata en el navegador) y deja `dist/app.html` vacío para `/admin` y `/resena`. Si agregas algo a la portada que dependa de `window` durante el render, el prerenderizado fallará: muévelo a un `useEffect`.
 
 ## Base de datos
 
