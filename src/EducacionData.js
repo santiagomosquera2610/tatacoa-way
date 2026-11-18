@@ -2,7 +2,7 @@ export const BUENAS_PRACTICAS = [
   {
     id: 1,
     titulo: 'Lleva tu basura de vuelta',
-    texto: 'No hay recolección en el desierto. Todo lo que entra contigo, sale contigo.',
+    texto: 'Todo lo que entra contigo, sale contigo. Así el desierto se mantiene limpio.',
     icono: 'Trash2',
     bg: 'bg-emerald-50',
     color: 'text-emerald-600',
@@ -26,7 +26,7 @@ export const BUENAS_PRACTICAS = [
   {
     id: 4,
     titulo: 'Hidrátate antes de salir',
-    texto: 'El desierto supera los 35°C al mediodía. Carga agua suficiente para todo el recorrido.',
+    texto: 'Las máximas rondan los 34 °C y en agosto y septiembre pasan de 35 °C. Carga agua suficiente para todo el recorrido.',
     icono: 'Droplets',
     bg: 'bg-gray-100',
     color: 'text-desert-stone',

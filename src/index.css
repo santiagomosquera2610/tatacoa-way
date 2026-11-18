@@ -1,13 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+/* La fuente Outfit se carga desde index.html (en paralelo, no en cadena desde el CSS). */
 @import "tailwindcss";
 
 @theme {
   --font-sans: 'Outfit', ui-sans-serif, system-ui, sans-serif;
   
   --color-desert-red: #9e3d2a;
-  --color-desert-earth: #c86343;
+  /* Tonos ajustados para contraste WCAG AA (≥ 4.5:1 sobre crema), corrección 1.2 */
+  --color-desert-earth: #a34b2b;
   --color-desert-sand: #f2e2ce;
-  --color-desert-stone: #9ba09d;
+  --color-desert-stone: #5f6563;
   --color-desert-night: #2a333a;
   
   /* Tinted shadows required by design-taste-frontend */
@@ -35,4 +36,17 @@ body {
 /* Filtro para que el mapa estándar se vea con estilo desértico/premium */
 .desert-map-tiles {
   filter: sepia(0.2) hue-rotate(-10deg) saturate(1.1) contrast(0.95);
+}
+
+/* Estrellas de la transición nocturna en Descubre (solo CSS, sin imágenes) */
+.cielo-estrellado {
+  background-image:
+    radial-gradient(1px 1px at 20px 30px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 120px 80px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 200px 150px, rgba(255,255,255,0.8), transparent),
+    radial-gradient(1px 1px at 300px 40px, rgba(255,255,255,0.6), transparent),
+    radial-gradient(1px 1px at 60px 190px, rgba(255,255,255,0.7), transparent),
+    radial-gradient(1.5px 1.5px at 340px 210px, rgba(255,255,255,0.9), transparent),
+    radial-gradient(1px 1px at 250px 260px, rgba(255,255,255,0.5), transparent);
+  background-size: 380px 280px;
 }

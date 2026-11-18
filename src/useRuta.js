@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+// Rutas reales por calles y senderos (OSRM público de openstreetmap.de,
+// gratis y sin API key). Las coordenadas van como lon,lat.
 const BASE_POR_PERFIL = {
   pie: 'https://routing.openstreetmap.de/routed-foot/route/v1/foot/',
   carro: 'https://routing.openstreetmap.de/routed-car/route/v1/driving/',

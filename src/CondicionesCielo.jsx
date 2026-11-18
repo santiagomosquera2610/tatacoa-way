@@ -21,6 +21,9 @@ function IconoLuna({ iluminacion }) {
   );
 }
 
+// Botón de luna en el Mapa que abre "Cielo esta noche": clima actual de
+// Open-Meteo y fase lunar calculada en el propio celular (ver
+// useCondicionesCielo.js).
 export function CondicionesCielo() {
   const [abierto, setAbierto] = useState(false);
   const { clima, luna, estado, recomendacion } = useCondicionesCielo();
@@ -31,7 +34,8 @@ export function CondicionesCielo() {
       <button
         onClick={() => setAbierto(true)}
         className="absolute bottom-32 left-6 z-[400] bg-white p-4 rounded-full shadow-xl border-2 border-desert-earth/40 hover:bg-desert-sand/20 transition-all flex items-center justify-center"
-        title="Condiciones del cielo"
+        title="Cielo esta noche"
+        aria-label="Ver clima y fase lunar"
       >
         <Moon size={26} className="text-desert-earth" />
       </button>
@@ -57,6 +61,7 @@ export function CondicionesCielo() {
                 <h2 className="text-xl font-black text-desert-night">Cielo esta noche</h2>
                 <button
                   onClick={() => setAbierto(false)}
+                  aria-label="Cerrar"
                   className="p-2 rounded-full bg-desert-sand/40 text-desert-night"
                 >
                   <X size={18} strokeWidth={2.5} />

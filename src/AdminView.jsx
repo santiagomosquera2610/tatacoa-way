@@ -3,11 +3,13 @@ import { motion, AnimatePresence, useReducedMotion } from 'motion/react';
 import {
   Star, Check, X, Pencil, Trash2, Plus, LogOut, MapPin,
   Search, Package, QrCode, MessageSquare, AlertTriangle, Inbox,
+  Smartphone, RotateCw, ExternalLink,
 } from 'lucide-react';
 import { useAuth } from './useAuth';
 import { useServicios, crearServicio, actualizarServicio, eliminarServicio } from './useServicios';
 import { useResenasAdmin, aprobarResena, rechazarResena } from './useResenas';
 import { QRAdminView } from './QRAdminView';
+import { Foto } from './Foto';
 import { supabaseHabilitado } from './supabaseClient';
 
 const CATEGORIAS = ['Guías', 'Transporte', 'Hospedaje', 'Gastronomía'];
@@ -27,6 +29,11 @@ const FOTOS_DISPONIBLES = [
 const SPRING_SUAVE = { type: 'spring', damping: 32, stiffness: 320 };
 const SPRING_HOJA = { type: 'spring', damping: 30, stiffness: 280 };
 
+// Panel del semillero (/admin). Requiere sesión de Supabase Auth.
+// Pestañas: Reseñas (moderación), Servicios (alta, edición y borrado del
+// directorio), Códigos QR (imprimir/descargar) y Vista pública (la app
+// tal como la ve un turista). Cada cambio se refleja en la app pública
+// sin redesplegar, porque ambas leen la misma base de datos.
 export function AdminView() {
   const { session, cargando, entrar, salir } = useAuth();
   const [tab, setTab] = useState('resenas');
@@ -45,8 +52,10 @@ export function AdminView() {
   }
 
   const pendientes = resenas.filter(r => !r.aprobado).length;
-  const ratingPromedio = servicios.length
-    ? (servicios.reduce((acc, s) => acc + Number(s.rating || 0), 0) / servicios.length).toFixed(1)
+  // Promedio de reseñas reales aprobadas (ya no existe calificación inicial).
+  const aprobadas = resenas.filter(r => r.aprobado);
+  const ratingPromedio = aprobadas.length
+    ? (aprobadas.reduce((acc, r) => acc + Number(r.calificacion), 0) / aprobadas.length).toFixed(1)
     : '—';
 
   if (!supabaseHabilitado) {
@@ -69,12 +78,13 @@ export function AdminView() {
     { id: 'resenas', label: 'Reseñas', icon: MessageSquare, badge: pendientes },
     { id: 'servicios', label: 'Servicios', icon: Package },
     { id: 'qr', label: 'Códigos QR', icon: QrCode },
+    { id: 'vista', label: 'Vista pública', icon: Smartphone },
   ];
 
   return (
     <div className="min-h-[100dvh] bg-[#FDFBF7]">
       <header
-        className="sticky top-0 z-10 px-6 pb-4 flex items-center justify-between border-b border-desert-sand/50"
+        className="print:hidden sticky top-0 z-10 px-6 pb-4 flex items-center justify-between border-b border-desert-sand/50"
         style={{
           paddingTop: 'max(1rem, env(safe-area-inset-top))',
           background: 'rgba(253, 251, 247, 0.85)',
@@ -90,13 +100,13 @@ export function AdminView() {
         </button>
       </header>
 
-      <div className="px-6 pt-5 grid grid-cols-3 gap-3">
+      <div className="print:hidden px-6 pt-5 grid grid-cols-3 gap-3">
         <StatCard label="Servicios" valor={servicios.length} />
         <StatCard label="Pendientes" valor={pendientes} resaltar={pendientes > 0} />
-        <StatCard label="Rating prom." valor={ratingPromedio} />
+        <StatCard label="Prom. reseñas" valor={ratingPromedio} />
       </div>
 
-      <div className="px-6 pt-5 flex gap-2 overflow-x-auto scrollbar-hide">
+      <div className="print:hidden px-6 pt-5 flex gap-2 overflow-x-auto scrollbar-hide">
         {TABS.map(t => {
           const Icono = t.icon;
           const activo = tab === t.id;
@@ -139,6 +149,7 @@ export function AdminView() {
           />
         )}
         {tab === 'qr' && <div className="-m-6"><QRAdminView /></div>}
+        {tab === 'vista' && <VistaPublicaTab />}
       </div>
 
       <AnimatePresence>
@@ -156,6 +167,49 @@ export function AdminView() {
       </AnimatePresence>
 
       <ToastHost toast={toast} reducirMovimiento={reducirMovimiento} />
+    </div>
+  );
+}
+
+// Vista previa de la app pública tal como la ve un turista, dentro de un
+// marco de celular. Muestra los datos en vivo (lo que se edita aquí se ve
+// ahí al recargar). La app pública no tiene ningún enlace a /admin.
+function VistaPublicaTab() {
+  const [recarga, setRecarga] = useState(0);
+
+  return (
+    <div className="flex flex-col items-center">
+      <div className="w-full max-w-[390px] flex items-center justify-between mb-4">
+        <p className="text-sm font-medium text-desert-stone">Así ve la app un turista.</p>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setRecarga(n => n + 1)}
+            aria-label="Recargar vista pública"
+            className="p-2.5 rounded-full bg-white border border-desert-sand/50 text-desert-night active:scale-95 transition-transform"
+          >
+            <RotateCw size={16} />
+          </button>
+          <a
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Abrir la app pública en una pestaña nueva"
+            className="p-2.5 rounded-full bg-white border border-desert-sand/50 text-desert-night active:scale-95 transition-transform"
+          >
+            <ExternalLink size={16} />
+          </a>
+        </div>
+      </div>
+
+      <div className="w-full max-w-[390px] rounded-[44px] border-[10px] border-desert-night bg-desert-night shadow-desert-lg overflow-hidden">
+        <iframe
+          key={recarga}
+          src="/"
+          title="Vista pública de Tatacoa Way"
+          className="block w-full h-[min(780px,72dvh)] bg-[#FDFBF7] rounded-[34px]"
+        />
+      </div>
     </div>
   );
 }
@@ -421,8 +475,9 @@ function EmptyState({ icon: Icono, texto }) {
 }
 
 const SERVICIO_VACIO = {
-  nombre: '', especialidad: '', categoria: CATEGORIAS[0], verificado: true,
-  fotoUrl: '', telefono: '', descripcion: '', precio: '', incluye: [], rating: 4.5,
+  // Un servicio nuevo nace sin verificar: el semillero lo marca a propósito.
+  nombre: '', especialidad: '', categoria: CATEGORIAS[0], verificado: false,
+  fotoUrl: '', telefono: '', descripcion: '', precio: '', incluye: [],
   lat: '', lon: '',
 };
 
@@ -493,15 +548,15 @@ function ServiciosTab({ servicios, cargando, recargar, avisar, pedirConfirmacion
 
       {visibles.map(s => (
         <div key={s.id} className="bg-white rounded-2xl p-4 border border-desert-sand/50 shadow-desert-sm flex items-center gap-3">
-          <img src={s.fotoUrl} alt={s.nombre} className="w-14 h-14 rounded-xl object-cover shrink-0 bg-desert-sand" />
+          <Foto src={s.fotoUrl} alt={s.nombre} sizes="56px" className="w-14 h-14 rounded-xl object-cover shrink-0 bg-desert-sand" />
           <div className="flex-1 min-w-0">
             <p className="font-black text-desert-night truncate">{s.nombre}</p>
             <p className="text-desert-stone text-xs font-medium truncate">{s.categoria} · {s.especialidad}</p>
           </div>
-          <button onClick={() => setEditando(s)} className="p-2 rounded-full bg-desert-sand/30 text-desert-night shrink-0 active:scale-90 transition-transform">
+          <button onClick={() => setEditando(s)} aria-label={`Editar ${s.nombre}`} className="p-2 rounded-full bg-desert-sand/30 text-desert-night shrink-0 active:scale-90 transition-transform">
             <Pencil size={15} />
           </button>
-          <button onClick={() => handleEliminar(s)} className="p-2 rounded-full bg-desert-sand/30 text-desert-red shrink-0 active:scale-90 transition-transform">
+          <button onClick={() => handleEliminar(s)} aria-label={`Eliminar ${s.nombre}`} className="p-2 rounded-full bg-desert-sand/30 text-desert-red shrink-0 active:scale-90 transition-transform">
             <Trash2 size={15} />
           </button>
         </div>
@@ -517,6 +572,7 @@ function ServiciosTab({ servicios, cargando, recargar, avisar, pedirConfirmacion
               await recargar();
               avisar(creando ? 'Servicio creado.' : 'Cambios guardados.');
             }}
+            onError={(mensaje) => avisar(mensaje, 'error')}
           />
         )}
       </AnimatePresence>
@@ -524,12 +580,11 @@ function ServiciosTab({ servicios, cargando, recargar, avisar, pedirConfirmacion
   );
 }
 
-function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
+function ServicioFormModal({ servicio, esNuevo, onClose, onSaved, onError }) {
   const [form, setForm] = useState({
     ...servicio,
     incluyeTexto: (servicio.incluye ?? []).join(', '),
     telefono: servicio.telefono ?? '',
-    rating: servicio.rating ?? '',
     lat: servicio.lat ?? '',
     lon: servicio.lon ?? '',
   });
@@ -545,18 +600,22 @@ function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
     const datos = {
       ...form,
       incluye: form.incluyeTexto.split(',').map(s => s.trim()).filter(Boolean),
-      rating: form.rating === '' ? null : Number(form.rating),
       telefono: form.telefono === '' ? null : form.telefono,
       lat: form.lat === '' ? null : Number(form.lat),
       lon: form.lon === '' ? null : Number(form.lon),
     };
-    if (esNuevo) {
-      await crearServicio(datos);
-    } else {
-      await actualizarServicio(servicio.id, datos);
+    const { error } = esNuevo
+      ? await crearServicio(datos)
+      : await actualizarServicio(servicio.id, datos);
+    setGuardando(false);
+    if (error) {
+      // Antes se mostraba "Cambios guardados" aunque Supabase rechazara el
+      // cambio (p. ej. sesión vencida). Ahora se avisa y el formulario sigue
+      // abierto para no perder lo escrito.
+      onError(`No se pudo guardar: ${error}`);
+      return;
     }
     await onSaved();
-    setGuardando(false);
     onClose();
   }
 
@@ -632,7 +691,6 @@ function ServicioFormModal({ servicio, esNuevo, onClose, onSaved }) {
         </div>
 
         <Campo label="Incluye (separado por comas)" value={form.incluyeTexto} onChange={v => campo('incluyeTexto', v)} />
-        <Campo label="Calificación inicial (1-5)" type="number" step="0.1" min="1" max="5" value={form.rating} onChange={v => campo('rating', v)} placeholder="Déjalo vacío si aún no se ha evaluado" />
 
         <label className="flex items-center gap-3 bg-desert-sand/20 rounded-2xl p-4 cursor-pointer">
           <input

@@ -2,9 +2,13 @@ import { useState } from 'react';
 import { Star, MapPin, Check } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useServicios } from './useServicios';
+import { Foto } from './Foto';
 import { enviarResena } from './useResenas';
 import { supabaseHabilitado } from './supabaseClient';
 
+// Formulario público de reseña (/resena/:id). Sin cuenta ni datos
+// personales: solo estrellas y un comentario opcional, que queda pendiente
+// de moderación.
 export function ResenaView({ servicioId }) {
   const { servicios, cargando } = useServicios();
   const servicio = servicios.find(s => String(s.id) === String(servicioId));
@@ -35,7 +39,7 @@ export function ResenaView({ servicioId }) {
 
   return (
     <div className="min-h-[100dvh] bg-[#FDFBF7] flex justify-center">
-      <div className="w-full max-w-md px-6 pt-16 pb-12 flex flex-col">
+      <main className="w-full max-w-md px-6 pt-16 pb-12 flex flex-col">
         <div className="flex items-center gap-2 mb-8 justify-center">
           <MapPin className="text-desert-earth" size={22} strokeWidth={2.5} />
           <span className="font-black text-desert-night text-lg">Tatacoa Way</span>
@@ -59,7 +63,7 @@ export function ResenaView({ servicioId }) {
           <>
             <div className="bg-white rounded-3xl p-5 shadow-desert-sm border border-desert-sand/50 flex items-center gap-4 mb-8">
               <div className="w-16 h-16 rounded-2xl overflow-hidden shrink-0 bg-desert-sand">
-                <img src={servicio.fotoUrl} alt={servicio.nombre} className="w-full h-full object-cover" />
+                <Foto src={servicio.fotoUrl} alt={servicio.nombre} sizes="80px" prioridad className="w-full h-full object-cover" />
               </div>
               <div>
                 <h1 className="font-black text-desert-night text-lg leading-tight">{servicio.nombre}</h1>
@@ -78,6 +82,8 @@ export function ResenaView({ servicioId }) {
                       onClick={() => setCalificacion(n)}
                       onMouseEnter={() => setHover(n)}
                       onMouseLeave={() => setHover(0)}
+                      aria-label={`${n} ${n === 1 ? 'estrella' : 'estrellas'}`}
+                      aria-pressed={calificacion === n}
                       className="p-1"
                     >
                       <Star
@@ -126,7 +132,7 @@ export function ResenaView({ servicioId }) {
             </form>
           </>
         )}
-      </div>
+      </main>
     </div>
   );
 }

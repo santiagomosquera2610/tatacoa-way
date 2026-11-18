@@ -145,3 +145,14 @@ insert into servicios (nombre, especialidad, categoria, verificado, foto_url, te
 ---
 
 ## 9. Avísame cuando termines todos los bloques de SQL y el usuario, para verificar que todo quedó bien antes de publicar los cambios.
+
+---
+
+## 10. Borrar la calificación inicial (cierre 2026-2, corrección 1.1)
+
+La app ya no muestra la "calificación inicial" del semillero: solo cuenta el promedio de reseñas reales aprobadas. Este bloque borra esos números de la base de datos para que tampoco queden guardados. Es opcional (la app funciona igual sin correrlo), pero deja los datos coherentes con lo que dice el informe.
+
+```sql
+update servicios set rating_inicial = null;
+alter table servicios alter column rating_inicial drop default;
+```
