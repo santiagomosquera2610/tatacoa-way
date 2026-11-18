@@ -1,49 +1,30 @@
-import { StrictMode, lazy, Suspense } from 'react'
-import { createRoot, hydrateRoot } from 'react-dom/client'
+// Punto de entrada (corrección 1.3, rendimiento).
+//
+// La portada llega prerenderizada en el HTML (scripts/prerender.mjs). Para
+// que la foto principal se pinte lo antes posible, React (arranque.jsx) se
+// descarga y se ejecuta DESPUÉS de que esa foto termina de cargar: así el
+// JavaScript no compite con ella ni retrasa su pintado (LCP). Mientras
+// tanto la portada ya se ve completa. En /admin y /resena (HTML vacío)
+// React arranca de inmediato.
 import './index.css'
-import App from './App.jsx'
-import { FallbackCarga } from './FallbackCarga.jsx'
-// El panel (con el generador de QR) y el formulario de reseña se descargan
-// solo cuando se visitan, para que la portada cargue más rápido (1.3).
-const ResenaView = lazy(() => import('./ResenaView.jsx').then(m => ({ default: m.ResenaView })))
-const AdminView = lazy(() => import('./AdminView.jsx').then(m => ({ default: m.AdminView })))
 
-// Enrutamiento manual (sin librería de rutas): la app solo tiene tres
-// vistas. vercel.json sirve app.html (vacío) en /admin y /resena, e
-// index.html (con la portada prerenderizada) en el resto, para que todo
-// funcione al recargar o al abrir un QR.
-//   /            → app pública
-//   /resena/:id  → formulario de reseña (se abre desde el QR del prestador)
-//   /admin       → panel del semillero. A propósito NO hay ningún enlace a
-//                  esta ruta desde la app pública: se entra escribiéndola.
-function Root() {
-  const path = window.location.pathname;
-  const matchResena = path.match(/^\/resena\/(.+)$/);
-
-  if (matchResena) {
-    return <ResenaView servicioId={matchResena[1]} />;
-  }
-  if (path.startsWith('/admin')) {
-    return <AdminView />;
-  }
-  return <App />;
+let iniciado = false
+function arrancar() {
+  if (iniciado) return
+  iniciado = true
+  import('./arranque.jsx')
 }
 
-const arbol = (
-  <StrictMode>
-    <Suspense fallback={<FallbackCarga />}>
-      <Root />
-    </Suspense>
-  </StrictMode>
-)
-
-// En la portada, index.html ya trae el HTML prerenderizado (ver
-// scripts/prerender.mjs): React lo hidrata en vez de redibujarlo, así la
-// foto principal se ve desde el primer momento. /admin y /resena reciben
-// app.html, vacío, y se montan normalmente.
 const contenedor = document.getElementById('root')
-if (contenedor.hasChildNodes()) {
-  hydrateRoot(contenedor, arbol)
+const fotoPrincipal = contenedor.hasChildNodes()
+  ? contenedor.querySelector('img[fetchpriority="high"]')
+  : null
+
+if (fotoPrincipal && !fotoPrincipal.complete) {
+  const despuesDePintar = () => requestAnimationFrame(() => setTimeout(arrancar, 0))
+  fotoPrincipal.addEventListener('load', despuesDePintar, { once: true })
+  fotoPrincipal.addEventListener('error', arrancar, { once: true })
+  setTimeout(arrancar, 3000) // respaldo por si el evento nunca llega
 } else {
-  createRoot(contenedor).render(arbol)
+  arrancar()
 }

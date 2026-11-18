@@ -13,6 +13,7 @@
 - `npm run build` ahora genera el HTML de la portada al compilar (`src/entry-server.jsx` + `scripts/prerender.mjs`) y React lo hidrata: la foto principal y los textos se ven sin esperar al JavaScript.
 - `/admin` y `/resena/:id` reciben `app.html`, vacío (ver `vercel.json`), para no mostrar la portada en esas rutas.
 - Las fotos debajo de la portada se piden al primer scroll (o a los 4 s) para no quitarle red a la foto principal.
+- React se descarga y ejecuta después de que la foto principal termina de cargar (`main.jsx` → `arranque.jsx`): en PageSpeed el JavaScript estaba retrasando 1,75 s el pintado de la foto. Con red lenta aplicada, LCP 2,5 → 1,6 s.
 - PageSpeed real tras la primera parte (17 nov, 8:09 p. m.): celular 96 (LCP 2,8 s), accesibilidad 100. Medición local con la portada prerenderizada (Lighthouse, modo simulado): celular 99–100 con LCP 1,9–2,0 s; escritorio 100 con LCP 0,4 s.
 
 ### Corrección 1.2: accesibilidad (Lighthouse celular: 87 → 100 en el inicio)

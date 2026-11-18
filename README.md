@@ -21,7 +21,7 @@ Publicado en https://tatacoa-way.vercel.app
 
 ## Rutas
 
-El enrutamiento es manual en `src/main.jsx` (sin router). `vercel.json` sirve `app.html` en `/admin` y `/resena`, e `index.html` (con la portada prerenderizada) en el resto.
+El enrutamiento es manual en `src/arranque.jsx` (sin router). `vercel.json` sirve `app.html` en `/admin` y `/resena`, e `index.html` (con la portada prerenderizada) en el resto.
 
 | Ruta | Qué es |
 |---|---|
@@ -33,7 +33,8 @@ El enrutamiento es manual en `src/main.jsx` (sin router). `vercel.json` sirve `a
 
 | Archivo | Responsabilidad |
 |---|---|
-| `main.jsx` | Elige la vista según la ruta; hidrata la portada prerenderizada |
+| `main.jsx` | Punto de entrada: espera a que se pinte la foto de portada y luego carga React |
+| `arranque.jsx` | Elige la vista según la ruta; hidrata la portada prerenderizada |
 | `entry-server.jsx` | Render de la portada al compilar (prerenderizado) |
 | `Foto.jsx` | Imágenes WebP responsive (480/800/1200 px) con JPG de respaldo |
 | `MapaView.jsx` | Pestaña Mapa (Leaflet), cargada bajo demanda |
